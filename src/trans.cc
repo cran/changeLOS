@@ -45,6 +45,8 @@
 //-----------------------------------------------------------------------------
 // History: 30.08.2004, Matthias Wangler
 //                      the first version
+//          16.02.2004, Matthias Wangler
+//                      replace long with int
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -61,77 +63,77 @@ typedef dMatrix::iterator itMatrix;
 typedef vector<dMatrix> dArray;          // vector of double matrices (Array of double matrices)
 typedef dArray::iterator itArray;
 
-typedef map<string,long> StringLongMap;  // map with string keys and long values 
-typedef StringLongMap::iterator itStringLongMap;
+typedef map<string,int> StringIntMap;  // map with string keys and int values 
+typedef StringIntMap::iterator itStringIntMap;
 
-typedef map<double,long> DoubleLongMap;
-typedef DoubleLongMap::iterator itDoubleLongMap; // map with double keys and long values
+typedef map<double,int> DoubleIntMap;
+typedef DoubleIntMap::iterator itDoubleIntMap; // map with double keys and int values
 
 extern "C" {
 
   void trans( char** state_names, 
-              long* nr_states, 
+              int* nr_states, 
               char** from, 
               char** to, 
-              long* nr_from_to, 
-              long* nr_jumps, 
-              long* nr_start, 
+              int* nr_from_to, 
+              int* nr_jumps, 
+              int* nr_start, 
               double* times, 
-              long* nr_times,
+              int* nr_times,
 	      char** observ_from, 
               char** observ_to, 
               double* observ_time, 
-              long* nr_observ,
+              int* nr_observ,
               double* a, 
-              long* nrow, 
-              long* ncol, 
-              long* n ) {
+              int* nrow, 
+              int* ncol, 
+              int* n ) {
 
-    StringLongMap StateNames;  // for holding the state names
+    StringIntMap StateNames;  // for holding the state names
     
-    StringLongMap StatesFrom;  // for holding the states from where jumps are possible
+    StringIntMap StatesFrom;  // for holding the states from where jumps are possible
 
     string  CensState = "";    // name of the censoring state
 
-    DoubleLongMap Times;       // for holding the timepoints at which the jumps occurs
+    DoubleIntMap Times;       // for holding the timepoints at which the jumps occurs
 
     dArray A;                  // for the transition matrices
 
     // storing the passed state names
-    for( long i = 0; i < *nr_states; ++i ) {
-      StateNames.insert( StringLongMap::value_type(string(state_names[i]),i) );     
+    for( int i = 0; i < *nr_states; ++i ) {
+      StateNames.insert( StringIntMap::value_type(string(state_names[i]),i) );     
     }
     
     // the last passed statename is the name of the censoring variable   
     if( StateNames.size() > 0 ) {
-      itStringLongMap pos = StateNames.end(); // position after the last element
+      itStringIntMap pos = StateNames.end(); // position after the last element
       --pos;
       CensState = pos->first;       
     }     
     
     // storing the passed states from where jumps are possible
-    for( long i = 0; i < *nr_from_to; ++i ) {
+    for( int i = 0; i < *nr_from_to; ++i ) {
       nr_jumps[i] = 0;      
       if( StatesFrom.find( string(from[i]) ) == StatesFrom.end() ) {
-	StatesFrom.insert( StringLongMap::value_type(string(from[i]),i) );        
+	StatesFrom.insert( StringIntMap::value_type(string(from[i]),i) );        
       }
     }      
     
     // storing the passed timepoints at which jumps occurs       
-    for( long i = 0; i < *nr_times; ++i ) {
-      Times.insert( DoubleLongMap::value_type(times[i],i) );      
+    for( int i = 0; i < *nr_times; ++i ) {
+      Times.insert( DoubleIntMap::value_type(times[i],i) );      
     }
 
     // initialize the array of the transition matrices
-    long i = 0;
-    for(long k = 0; k < *n; ++k ) {  // loop over the time points
+    int i = 0;
+    for(int k = 0; k < *n; ++k ) {  // loop over the time points
 
       dMatrix M;
 
-      for( long c = 0; c < *ncol; ++c ) { // loop over the columns
+      for( int c = 0; c < *ncol; ++c ) { // loop over the columns
 	dVector V;
  
-	for( long r = 0; r < *nrow; ++r ) { // loop over the rows
+	for( int r = 0; r < *nrow; ++r ) { // loop over the rows
 
 	  V.push_back( a[i] );
 	  
@@ -150,7 +152,7 @@ extern "C" {
       string o_from(observ_from[i]);   // state name from where the observed jump occurs   
       string o_to(observ_to[i]);       // state name to which the observed jump occurs
 
-      for( long j = 0; j < *nr_from_to; ++j ) { // add the jump to the total number of jumps from state 'o_from' to state 'o_to'
+      for( int j = 0; j < *nr_from_to; ++j ) { // add the jump to the total number of jumps from state 'o_from' to state 'o_to'
 	if( o_from == string(from[j]) && o_to == string(to[j]) ) {
 	  nr_jumps[j] += 1;
 	}
@@ -158,25 +160,25 @@ extern "C" {
 
       if( o_to != CensState ) {   // jumps to the censoring state (censoring in state 'o_from') are ignored
         // find out the observed time point
-	itDoubleLongMap pos = Times.find( observ_time[i] );
+	itDoubleIntMap pos = Times.find( observ_time[i] );
 
         if( pos != Times.end() ) {
           // now we have the observed time point k
-	  long k = pos->second;    
+	  int k = pos->second;    
 
           // find out the state from where the observed jump occurs
-	  itStringLongMap posfrom = StateNames.find(o_from);
+	  itStringIntMap posfrom = StateNames.find(o_from);
 
           if( posfrom != StateNames.end() ) {
             // now we have the state (the position r in the vector of statenames) from where the observed jump ocurs
-	    long r = posfrom->second;
+	    int r = posfrom->second;
 
             // find out the state to which the observed jump occurs
-	    itStringLongMap posto = StateNames.find(o_to);
+	    itStringIntMap posto = StateNames.find(o_to);
             
 	    if( posto != StateNames.end() ) {
               // now we have the state (the position c in the vector of statenames) to which the observed jump ocurs
-	      long c = posto->second;
+	      int c = posto->second;
               
               // add this jump in the k'th matrix at column c and row r
 	      A[k][c][r] += 1;
@@ -190,31 +192,31 @@ extern "C" {
     dArray B(A);
     i=0;    
     for( ; i < *nr_times; ++i) {     
-      for( itStringLongMap frompos = StatesFrom.begin(); frompos != StatesFrom.end(); ++frompos ) { 
-        itStringLongMap pos =  StateNames.find(frompos->first);;
-        long j = pos->second;        
+      for( itStringIntMap frompos = StatesFrom.begin(); frompos != StatesFrom.end(); ++frompos ) { 
+        itStringIntMap pos =  StateNames.find(frompos->first);;
+        int j = pos->second;        
 	double risk = nr_start[j];        // Number in state j at start        
 	double jumps_to_j_before_i = 0;   // jumps to state j before timepoint number i
         double jumps_from_j_before_i = 0; // jumps from state j before timepoint number i
 	double cens_from_j_before_i = 0;  // censoring in state j before timepoint number i
 
-	for( long k = 0; k < i; ++k ) {
-	   for( long r = 0; r < *nrow; ++r ) {
+	for( int k = 0; k < i; ++k ) {
+	   for( int r = 0; r < *nrow; ++r ) {
 	     jumps_to_j_before_i += B[k][j][r];
 	   }
 
-	   for( long c = 0; c < *ncol; ++c ) {
+	   for( int c = 0; c < *ncol; ++c ) {
 	     jumps_from_j_before_i += B[k][c][j];
 	   }
         }
 
-        for(long ii = 0 ; ii < *nr_observ; ++ii) {
+        for(int ii = 0 ; ii < *nr_observ; ++ii) {
           string o_from(observ_from[ii]);
           string o_to(observ_to[ii]);
 
           if( o_to == CensState ) {                        
             if( observ_time[ii] < times[i] ) {
-	      itStringLongMap posfrom_1 = StateNames.find(o_from);
+	      itStringIntMap posfrom_1 = StateNames.find(o_from);
 	      
               if( posfrom_1 != StateNames.end() && posfrom_1->second == j ) {
 	        cens_from_j_before_i += 1;
@@ -226,17 +228,17 @@ extern "C" {
 	risk = risk + jumps_to_j_before_i - jumps_from_j_before_i - cens_from_j_before_i;
     
 	if( risk > 0 ) {
-	   for( long c = 0; c < *ncol; ++c ) {             
+	   for( int c = 0; c < *ncol; ++c ) {             
 	     A[i][c][j] = A[i][c][j] / risk;
 	   }
 	}  
       }
      
       // compute the diagonal elements: the sum over each row must be 1
-      for( long r = 0; r < *nrow; ++r ) {
+      for( int r = 0; r < *nrow; ++r ) {
         double sumrow = 0;
 
-        for( long c = 0; c < *ncol; ++c ) {
+        for( int c = 0; c < *ncol; ++c ) {
 	  if( c != r ) {
 	    sumrow += A[i][c][r];
 	  }	 
@@ -248,11 +250,11 @@ extern "C" {
     
     // prepare the array of the transition matrices for returning (transform the array to an vector)
     i = 0;
-    for( long k = 0; k < *n; ++k ) {  // loop over the timepoints
+    for( int k = 0; k < *n; ++k ) {  // loop over the timepoints
 
-      for( long c = 0;  c < *ncol; ++c ) {  // loop over the columns
+      for( int c = 0;  c < *ncol; ++c ) {  // loop over the columns
      
-        for( long r = 0; r < *nrow; ++r ) {   // loop over the rows
+        for( int r = 0; r < *nrow; ++r ) {   // loop over the rows
 
 	  a[i] = A[k][c][r];
 	  

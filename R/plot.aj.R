@@ -112,13 +112,21 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
 
   clb <- c("Time")
   
-  for( i in 1:length(from)) {
-    ylab= eval(substitute(expression(paste("Estimate of ", P[{a}][{b}], "(", italic(s), ",", italic(t), ")")), list(a=from[i],b=to[i],s=x$start)))
-    txt=eval(substitute(expression(paste(hat(P)[{a}][{b}], "(",italic( s), ",", italic(t), ")")), list(a=from[i],b=to[i],s=x$start)))
-    
-    plot(x=x$times,y=x$matrices[states[state.names==from[i]],states[state.names==to[i]],],
-         type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, col=col)
+  for( i in 1:length(from)) {    
+    if( length(from) > 1 ) {
+      ylab <- eval(substitute(expression(paste("Estimate of ", P[{a}][{b}], "(", italic(s), ",", italic(t), ")")),
+                              list(a=from[i],b=to[i],s=x$start)))
+      txt <- eval(substitute(expression(paste(hat(P)[{a}][{b}], "(",italic( s), ",", italic(t), ")")),
+                             list(a=from[i],b=to[i],s=x$start)))
 
+      plot(x=x$times,y=x$matrices[states[state.names==from[i]],states[state.names==to[i]],],
+           type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, col=col)
+    }
+    else {      
+      plot(x=x$times,y=x$matrices[states[state.names==from[i]],states[state.names==to[i]],],
+           type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, col=col, ...)
+    }
+    
     v <- c(v,x$matrices[states[state.names==from[i]],states[state.names==to[i]],])
 
     clb <- c(clb,paste(from[i],to[i]))

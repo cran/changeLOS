@@ -13,7 +13,7 @@ plot.clos(x,opt=0,
           xlim = c(0,max(x$trans$times[!is.na(x$e.given.1) | !is.na(x$e.given.0)])),
           ylim.1=c(0,max(x$e.given.1,x$e.given.0,na.rm=TRUE)),
           ylim.2=c(0,max(x$weights,na.rm=TRUE)),
-          col1=c(1,1),col2=c(1),
+          col1=c(1,2),col2=c(1), lty1=c(1,1), lty2=c(1), lwd1=c(2,2), lwd2=c(2),
           lab.1=c(10,10,7), lab.2=c(10,3,7),
           lgd=expression(paste(Intermediate, " ", event, " ", by, " ", time, " ",italic(t)),
                 paste(No, " ", intermediate, " ", event, " ", by, " ", time, " ",italic(t))),
@@ -37,6 +37,10 @@ plot.clos(x,opt=0,
   \item{ylim.2}{ the y limits of the plot of the weights}
   \item{col1}{ the color of the lines in the plot of the expected LOS}
   \item{col2}{ the color of the line in the plot of the weights}
+  \item{lty1}{ the line type of the lines in the plot of the expected LOS}
+  \item{lty2}{ the line type of the line in the plot of the weights}
+  \item{lwd1}{the positive line width of the lines in the plot of the expected LOS}
+  \item{lwd2}{the positive line width of the line in the plot of the weights}  
   \item{lab.1}{ A numerical vector of the form 'c(x, y, len)' which
     modifies the way that axes are annotated. The values of 'x' and 'y'
     give the (approximate) number of tickmarks on the x and y axes and

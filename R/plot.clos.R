@@ -3,7 +3,7 @@ plot.clos <- function(x,opt=0, xlab=expression(paste(Time, " ", italic(t))),
                       xlim = c(0,max(x$trans$times[!is.na(x$e.given.1) | !is.na(x$e.given.0)])),
                       ylim.1=c(0,max(x$e.given.1,x$e.given.0,na.rm=TRUE)),
                       ylim.2=c(0,max(x$weights,na.rm=TRUE)),
-                      col1=c(1,1),col2=c(1),
+                      col1=c(1,2),col2=c(1), lty1=c(1,1), lty2=c(1), lwd1=c(2,2), lwd2=c(2),
                       lab.1=c(10,10,7), lab.2=c(10,3,7),
                       lgd=expression(paste(Intermediate, " ", event, " ", by, " ", time, " ",italic(t)),
                                       paste(No, " ", intermediate, " ", event, " ", by, " ", time, " ",italic(t))),
@@ -89,14 +89,13 @@ plot.clos <- function(x,opt=0, xlab=expression(paste(Time, " ", italic(t))),
     if( opt == 0 ) {
       screen(2)
       w.lab=""
-      plot(x=c(0,x$w.times),y=c(0,x$weights), type ="s",axes=FALSE, lty=1, lwd=2, xlim=xlim,ylim=ylim.2,xlab=w.lab,ylab=ylab.2,col=col2)
+      plot(x=c(0,x$w.times),y=c(0,x$weights), type ="s",axes=FALSE, lty=lty2, lwd=lwd2, xlim=xlim,ylim=ylim.2,xlab=w.lab,ylab=ylab.2,col=col2)
       axis(side=2)
       box()
     }
     else {
-      plot(x=c(0,x$w.times),y=c(0,x$weights), type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim.2,xlab=w.lab,ylab=ylab.2,col=col2)
-    }
-    
+      plot(x=c(0,x$w.times),y=c(0,x$weights), type ="s", lty=lty2, lwd=lwd2, xlim=xlim,ylim=ylim.2,xlab=w.lab,ylab=ylab.2,col=col2)
+    }    
   }
   
   if( opt == 0 || opt == 1 ) {
@@ -106,11 +105,11 @@ plot.clos <- function(x,opt=0, xlab=expression(paste(Time, " ", italic(t))),
     
     par(lab=lab.1)
     
-    plot(x=x$trans$times,y=x$e.given.1, type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim.1,xlab=xlab,ylab=ylab.1,col=col1[1])
+    plot(x=x$trans$times,y=x$e.given.1, type ="s", lty=lty1[1], lwd=lwd1[1], xlim=xlim,ylim=ylim.1,xlab=xlab,ylab=ylab.1,col=col1[1])
 
-    lines(x=x$trans$times,y=x$e.given.0, type ="s", lty=3, lwd=2,col=col1[2])
+    lines(x=x$trans$times,y=x$e.given.0, type ="s", lty=lty1[2], lwd=lwd1[2],col=col1[2])
 
-    legend(x.lgd, y.lgd, lgd , lty=c(1,3), bty=bty.lgd, col=col1)
+    legend(x.lgd, y.lgd, lgd , lty=lty1, bty=bty.lgd, col=col1)
     
   }  
 

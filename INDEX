@@ -8,11 +8,11 @@ plot.clos               Plot function for objects of class 'clos'
 prepare.los.data        Prepare the data for clos
 print.aj                Print and summary method for objects of class
                         'aj'
-print.clos              Print and summary method for objects of class
-                        'clos'
+print.clos              Print method for objects of class 'clos'
 print.msmodel           Print and summary method for objects of class
                         'msmodel'
-print.trans             Print and summary method for objects of class
-                        'trans'
+print.trans             Print method for objects of class 'trans'
 read.los.data           Read the data for clos
+summary.clos            Summary method for objects of class 'clos'
+summary.trans           Summary method for objects of class 'trans'
 trans                   transition matrices
