@@ -1,0 +1,168 @@
+trans <- function(model, observ) {
+## ----------------------------------------------------------------------------
+## Title: trans
+## ----------------------------------------------------------------------------
+## Author: Matthias Wangler
+##         mw@imbi.uni-freiburg.de
+##         Institute of Med. Biometry and Med. Computer Science
+##         Stefan-Meier-Strasse 26, D-79104 Freiburg,
+##         http://www.imbi.uni-freiburg.de
+## ----------------------------------------------------------------------------
+## Description: Estimates a matrix of transition probabilities for every transition time 
+## ----------------------------------------------------------------------------
+## Required Packages: -
+## ----------------------------------------------------------------------------
+## Usage: trans(model=my.model,observ=my.observ)
+##
+## model:     an object of the class 'msmodel' which describes the multi-state model
+##
+## observ:   a data frame of the form data.frame( id, from, to, time )
+##           id   : id (patient id, admision id, ...)
+##           from : the state from where the transition occurs
+##           to   : the state to whiche the transition occurs
+##           time : the time the transition occurs
+##           oid:  the observation id     
+## ----------------------------------------------------------------------------
+## Value: an object 'trans'
+##
+##        trans$matrices: array of transition matrices for every transition time
+##        trans$times: the transition times
+##        trans$nrtransitions: a matrix holding the number of transitions
+##        trans$state.names: vector withe the names of the states
+## ----------------------------------------------------------------------------  
+## Notes: It's possible that the same patient, person or object was observed several
+##        times (e.g. bootstrap).
+##        So for each observation the same id recieves different observation id's. 
+## ----------------------------------------------------------------------------
+## Example: > data(los.data)
+##          > my.observ <- prepare.los.data(x=los.data)
+##          > my.model <- msmodel(c("0","1","2","3"),cens.name="cens")
+##          > my.trans <- trans(model=my.model,observ=my.observ)  
+## ----------------------------------------------------------------------------
+## License: GPL 2
+##-----------------------------------------------------------------------------
+## History: 26.07.2004, Matthias Wangler
+##                      the first version
+## ----------------------------------------------------------------------------
+
+  ## check the passed parameters
+  if( missing(model) )
+  {
+    stop("Argument 'model' is missing, with no defauls.")
+  }
+  
+  if( missing(observ) )
+  {
+    stop("Argument 'data' is missing, with no defauls.")
+  }
+
+  if( !inherits(model,"msmodel") )
+  {
+    stop("Arguemnt 'model' must be an object of class 'msmodel'.") 
+
+  }
+
+  if( !is.data.frame(observ) )
+  {
+    stop("Argument 'observ' must be a 'data.frame'.")
+  }
+    
+  ## check the number of columns of the passed data.frame observ
+  if( dim(observ)[2] != 5 )
+  {
+    stop("The passed data.frame 'observ' doesn't include 4 columns.")      
+  }
+
+  ## check the column names of the passed data.frame observ
+  if( names (observ)[1] != "id" || names (observ)[2] != "from"
+     || names(observ)[3] != "to" || names(observ)[4] != "time" || names(observ)[5] != "oid")
+  {
+    stop("The passed data.frame 'observ' must have the columns 'id', 'from', 'to', 'time' and 'oid'.")
+  }
+    
+  ## check the number of rows of the passed data.frame observ
+  if( dim(observ)[1] == 0 )
+  {
+    stop("The passed data.frame 'observ' doesn't contain rows. There is nothing to do")
+  }
+  
+  states <- model$states
+  
+  state.names <- model$state.names
+  
+  len <- length(model$state.names)
+  
+  ## check the observation data for undefined states
+  stn <- unique( c(as.character(observ$from), as.character(observ$to) ) )
+  if( length(stn[!(stn %in% state.names)]) > 0 ) {
+    stop("Undefined states in the observation.")
+  }
+    
+  ## check the observations if censoring TRUE or FALSE
+  censoring <- FALSE
+  if( state.names[len] %in% observ$to ) {
+    censoring <- TRUE
+  }
+  
+  ## check the obsrvation data for undefined transitions
+  observ.transitions <- unique(observ[,2:3])    
+  a <- paste(observ.transitions[,1],observ.transitions[,2],sep="") 
+  b <- paste( state.names[model$transitions[,1]], state.names[model$transitions[,2]],sep="") 
+  if( length(a[!(a %in% b)]) > 0 )
+  {
+    stop("Undefined transitions 'from'-'to' in the observation.")
+  }
+
+  ## compute the initial distribution (number in each state at the begin)
+  nr.start <- rep(0, len-1)
+  for( i in 1:(len-1) ) {
+    nf <- sum(observ$from==state.names[i]) - sum(observ$to==state.names[i])
+
+    if( nf > 0 ) {
+      nr.start[i] <- nf
+    }
+  }
+  
+  ## time points
+  times <- sort(unique(observ$time[observ$to != state.names[len]]))
+
+  ## array for the transition matrices
+  matrices <- array(0, c( nrow(model$tra), ncol(model$tra),length(times)))
+
+  ## matrix for storing the total number of transitions for all possible transitions
+  nrtransitions <-  matrix(c(model$transitions[,1], model$transitions[,2], rep(0,length(model$transitions[,1]))),
+                     nrow = length(model$transitions[,1]), ncol = 3, byrow = FALSE)   
+    
+  ## compute the 'transition matrices'
+  out <- .C("trans", as.character(state.names),
+                     as.integer(length(state.names)),
+                     as.character(state.names[model$transitions[,1]]),
+                     as.character(state.names[model$transitions[,2]]),
+                     as.integer(nrow(model$transitions)),
+                     nj = as.integer(nrtransitions[,3]),
+                     as.integer(nr.start) , as.double(times),
+                     as.integer(length(times)),
+                     as.character(observ$from),
+                     as.character(observ$to),
+                     as.double(observ$time),
+                     as.integer(length(observ$from)),
+                     ma = as.double(matrices),
+                     as.integer(nrow(model$tra)),
+                     as.integer(ncol(model$tra)),
+                     as.integer(length(times)),
+            PACKAGE="changeLOS")
+
+  matrices <- array(out$ma, c( nrow(model$tra), ncol(model$tra),length(times)))
+
+  nrtransitions[,3] <- out$nj
+     
+  dimnames(matrices) <- list(state.names[1:len-1],state.names[1:len-1], paste("Time Nr. ",1:length(times), sep=""))
+     
+  res <- list(matrices, times, nrtransitions, model$state.names, nr.start)
+
+  names(res) <- c("matrices", "times", "nrtransitions", "state.names", "nr.start")
+  
+  class(res) <- "trans"
+  
+  return(res)
+}
