@@ -42,7 +42,7 @@ print.trans <- function(x, ...) {
   cat("Transition matrices:\n\n")
   
   for(i in 1:length(x$times)) {
-    cat("Estimated transition matrix for P(", x$times[i], "-,",x$times[i],"):", sep="")
+   cat("Estimated transition matrix for P(", x$times[i], "-,",x$times[i],"):", sep="")
     cat("\n")
     print(x$matrices[,,i])
     cat("\n")

@@ -40,19 +40,23 @@ print.summary.trans <- function(x, ...) {
     
   cat("Total number of transitions:\n\n")
 
-  mj <-  matrix( c( x$state.names[x$nrtransitions[,1][x$nrtransitions[,2]!=len]],
-                    x$state.names[x$nrtransitions[,2][x$nrtransitions[,2]!=len]],
-                    as.character(x$nrtransitions[,3][x$nrtransitions[,2]!=len]) ),
-                 nrow = length(x$state.names[x$nrtransitions[,1][x$nrtransitions[,2]!=len]]),
+  from <- x$nrtransitions[,1]+1
+  to <- x$nrtransitions[,2] + 1
+  count <- x$nrtransitions[,3]
+
+  mj <-  matrix( c( x$state.names[from[to!=len]],
+                    x$state.names[to[to!=len]],
+                    as.character(count[to!=len]) ),
+                 nrow = length(x$state.names[from[to!=len]]),
                  ncol = 3, byrow = FALSE ) 
   
   prmatrix(mj, rowlab=rep("",nrow(mj)), collab=c("  from", "    to", "  transitions"), quote = FALSE, right = TRUE)
   cat("\n")
   
-  if( length(x$nrtransitions[,3][x$nrtransitions[,2]==len & x$nrtransitions[,3] > 0]) > 0 ) {
-    for( i in 1:length(x$nrtransitions[,1][x$nrtransitions[,2]==len]) ) {
-      cat(paste("censored in state ", x$state.names[x$nrtransitions[,1][x$nrtransitions[,2]==len][i]], ": ",
-                x$nrtransitions[,3][x$nrtransitions[,2]==len][i], sep=""))
+  if( length(count[to==len & count > 0]) > 0 ) {
+    for( i in 1:length(from[to==len]) ) {
+      cat(paste("censored in state ", x$state.names[from[to==len][i]], ": ",
+                count[to==len][i], sep=""))
       cat("\n")
     }
   }
@@ -68,9 +72,12 @@ print.summary.trans <- function(x, ...) {
 
   cat("the number in the states just before the transition times:\n")
   m <- cbind(x$times, x$nr.before)
-  colnames(m) <- c("time", my.model$state.names)
+  colnames(m) <- c("time", colnames(x$nr.before))
   rownames(m) <- rep("",nrow(m))
   print(m)
+
+  cat("\n")
+ 
   
   
 } ## end of function print.summary.trans

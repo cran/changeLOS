@@ -86,7 +86,7 @@ trans <- function(model, observ) {
     stop("The passed data.frame 'observ' doesn't contain rows. There is nothing to do")
   }
   
-  states <- model$states
+  states <- model$states - 1
   
   state.names <- model$state.names
   
@@ -113,60 +113,76 @@ trans <- function(model, observ) {
     stop("Undefined transitions 'from'-'to' in the observation.")
   }
 
+  observ <- observ[order(observ[,"time"]),]
+  observ.time <- observ[,"time"]
+  observ.from <- observ[,"from"]
+  observ.to <- observ[,"to"]
+    
+  observ.from <- as.integer(factor(observ.from,levels=state.names)) - 1
+  observ.from <- as.numeric(observ.from)
+    
+  observ.to <- as.integer(factor(observ.to, levels=state.names)) - 1
+  observ.to <- as.numeric(observ.to)
+
+  observ.event <- rep(1,length(observ.to))
+  observ.event[observ.to==states[len]] <- 0
+    
+  nr.observ  <- length(observ.time)
+
+  ## time points
+  times <- sort(unique(observ.time[observ.to != states[len]]))
+
+  ## array for the transition matrices
+  matrices <- array(0, c( nrow(model$tra), ncol(model$tra),length(times)))
+  
   ## compute the initial distribution (number in each state at the begin)
-  nr.start <- rep(0, len)
+  nr.start <- rep(0, ifelse(censoring==TRUE,len,len-1))
   for( i in 1:(len-1) ) {
-    nf <- sum(observ$from==state.names[i]) - sum(observ$to==state.names[i])
+    nf <- sum(observ.from==states[i]) - sum(observ.to==states[i])
 
     if( nf > 0 ) {
       nr.start[i] <- nf
     }
   }
-  
-  ## time points
-  times <- sort(unique(observ$time[observ$to != state.names[len]]))
 
-  ## array for the transition matrices
-  matrices <- array(0, c( nrow(model$tra), ncol(model$tra),length(times)))
-
-  ## matrix to store the number in each state just before the transition times
-  nr.before <- matrix(0, nrow=length(times), ncol=length(states))
+  ## matrix to store the number in each state just before the transition times (risk)
+  nr.before <- matrix(0, nrow=length(times), ncol=ifelse(censoring==TRUE,len,len-1))
   nr.before[1,] <- nr.start
 
   ## matrix for storing the total number of transitions for all possible transitions
-  nrtransitions <-  matrix(c(model$transitions[,1], model$transitions[,2], rep(0,length(model$transitions[,1]))),
-                     nrow = length(model$transitions[,1]), ncol = 3, byrow = FALSE)   
-    
-  ## compute the 'transition matrices'
-  out <- .C("trans", as.integer(states),
-                     as.integer(length(states)),
-                     as.integer(model$transitions[,1]),
-                     as.integer(model$transitions[,2]),
-                     as.integer(nrow(model$transitions)),
-                     nj = as.integer(nrtransitions[,3]),
-                     nr = as.integer(nr.before),
-                     as.double(times),
-                     as.integer(length(times)),
-                     as.integer(match(as.character(observ$from),state.names)),
-                     as.integer(match(as.character(observ$to),state.names)),
-                     as.double(observ$time),
-                     as.integer(match(observ$time, times)),
-                     as.integer(length(observ$from)),
-                     ma = as.double(matrices),
-                     as.integer(nrow(model$tra)),
-                     as.integer(ncol(model$tra)),
-            PACKAGE="changeLOS")
-
-  matrices <- array(out$ma, c( nrow(model$tra), ncol(model$tra),length(times)))
+  nrtransitions <-  matrix(c(model$transitions[,1]-1, model$transitions[,2]-1, rep(0,length(model$transitions[,1]))),
+                     nrow = length(model$transitions[,1]), ncol = 3, byrow = FALSE)             
+  
+  out <- .C("trans",
+             as.integer(length(states)-1),
+             as.integer(length(times)),
+             as.integer(length(observ.time)),
+             as.integer(model$transitions[,1]-1),
+             as.integer(model$transitions[,2]-1),
+             as.integer(nrow(model$transitions)),
+             nj = as.integer(nrtransitions[,3]),
+             as.double(observ.time),
+             as.integer(observ.event),
+             as.integer(observ.from),
+             as.integer(observ.to),
+             nr = as.double(nr.before),
+             ma = as.double(matrices),
+             PACKAGE="changeLOS")
 
   nrtransitions[,3] <- out$nj
-     
-  dimnames(matrices) <- list(state.names[1:len-1],state.names[1:len-1], paste("Time Nr. ",1:length(times), sep=""))
+  
+  matrices <- array(out$ma, c( nrow(model$tra), ncol(model$tra), length(times)))
 
-  nr.before <- matrix(out$nr, nrow=length(times), ncol=length(states))
-    
+  dimnames(matrices) <- list(dimnames(model$tra)[[1]],dimnames(model$tra)[[2]] ,
+                             paste("Time Point ",1:length(times), ": ", times, sep=""))
+
+  nr.before <- matrix(out$nr, nrow=length(times), ncol=ifelse(censoring==TRUE,len,len-1))
+  if(censoring==TRUE) co <- state.names[1:len]
+  else                co <- state.names[1:(len-1)]
+  colnames(nr.before) <- co
+  rownames(nr.before) <- times
+
   res <- list(matrices, times, nrtransitions, model$state.names, nr.before)
-
   names(res) <- c("matrices", "times", "nrtransitions", "state.names", "nr.before")
   
   class(res) <- "trans"

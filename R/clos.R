@@ -285,22 +285,22 @@
     ## some results for a summary:
     
     ## number of patients
-    my.patients <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==1])
+    my.patients <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==0])
     ## number of patients being discharged
-    my.patients.discharge <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==3])
+    my.patients.discharge <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==2])
     ## number of patients being death
-    my.patients.death <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==4])
+    my.patients.death <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==3])
     ## number of patients being censored
-    my.patients.cens <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==5]) 
+    my.patients.cens <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==4]) 
 
     ## number of patients with complication
-    my.cases <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==2]) 
+    my.cases <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,2]==1]) 
     ## number of patients with complication being discharged
-    my.cases.discharge <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==2 & my.trans$nrtransitions[,2]==3])
+    my.cases.discharge <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==1 & my.trans$nrtransitions[,2]==2])
     ## number of patients with complication being death
-    my.cases.death <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==2 & my.trans$nrtransitions[,2]==4])
+    my.cases.death <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==1 & my.trans$nrtransitions[,2]==3])
     ## number of patients with complication being censored
-    my.cases.cens <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==2 & my.trans$nrtransitions[,2]==5])
+    my.cases.cens <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==1 & my.trans$nrtransitions[,2]==4])
         
     ## return results
     res <- list(cLOS=estimate, trans=my.trans,

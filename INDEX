@@ -12,6 +12,7 @@ print.clos              Print method for objects of class 'clos'
 print.msmodel           Print and summary method for objects of class
                         'msmodel'
 print.trans             Print method for objects of class 'trans'
+progdismodel            progressive disability model
 read.los.data           Read the data for clos
 summary.clos            Summary method for objects of class 'clos'
 summary.trans           Summary method for objects of class 'trans'
