@@ -41,18 +41,18 @@ trans(model, observ)
 }
 \value{
   An object of the class 'trans'. The object is a list of:
-  \item{trans$matrices}{ array of matrices \eqn{P(u-, u)} for every transition
+  \item{matrices}{ array of matrices \eqn{P(u-, u)} for every transition
     time \eqn{u}}
-  \item{trans$times}{ the transition times}
-  \item{trans$nrtransitions}{ a matrix with
+  \item{times}{ the transition times}
+  \item{nrtransitions}{ a matrix with
                            \describe{
                            \item{column 1}{the state from where a transition occurs}
                            \item{column 2}{the state to which a transition occurs}
                            \item{column 3}{the number of transitions}
                            }
                         }  
-  \item{trans$state.names}{ vector with the names of the states}
-  \item{trans$nr.start}{numeric vector of the initial distribution in the states}
+  \item{state.names}{ vector with the names of the states}
+  \item{nr.before}{ matrix with the number in each state just before the transition times}
 }
 \references{
   P Andersen, O Borgan, R Gill, and N Keiding (1993). \emph{Statistical

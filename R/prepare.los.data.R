@@ -17,11 +17,11 @@ prepare.los.data <- function(x) {
 ## x: data.frame of the form data.frame( id, j.01, j.02, j.03, j.12, j.13, cens):
 ##
 ## id:      id (patient id, admision id, ...)
-## j.01:    observed time for jump from 0 to 1
-## j.02:    observed time for jump from 0 to 2
-## j.03:    observed time for jump from 0 to 3
-## j.12:    observed time for jump from 1 to 2
-## j.13:    observed time for jump from 1 to 3
+## j.01:    observed time for jump from "0" to "1"
+## j.02:    observed time for jump from "0" to "2"
+## j.03:    observed time for jump from "0" to "3"
+## j.12:    observed time for jump from "1" to "2"
+## j.13:    observed time for jump from "1" to "3"
 ## cens:    observed time for censoring
 ## ---------------------------------------------------------------------------------
 ## Value: data.frame of the form data.frame(id, from, to, time ):

@@ -47,7 +47,9 @@ summary.trans <- function(object, ...) {
   
   summary$state.names <- object$state.names
 
-  summary$nr.start <- object$nr.start
+  summary$times <- object$times
+
+  summary$nr.before <- object$nr.before
       
   class(summary) <- "summary.trans"
 

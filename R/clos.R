@@ -163,7 +163,7 @@
     ## compute the transition times and the `transition matrix' for every transition time
     my.trans <-  trans(model, observ)
 
-    if( length(unique(observ$oid)) != my.trans$nr.start[1] ) {
+    if( length(unique(observ$oid)) != my.trans$nr.before[1,1] ) {
       stop(paste("Not all individuals start in the initial state '", model$state.names[1], "'.", sep=""))
     }
     

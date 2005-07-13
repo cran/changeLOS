@@ -61,9 +61,16 @@ print.summary.trans <- function(x, ...) {
 
   cat("the initial distribution:\n")
   for(i in 1:(len-1)) {
-    cat(x$nr.start[i], " in state '", as.character(x$state.names[i]), "'", sep= "")
+    cat(x$nr.before[1,i], " in state '", as.character(x$state.names[i]), "'", sep= "")
     cat("\n")
   }
   cat("\n")
+
+  cat("the number in the states just before the transition times:\n")
+  m <- cbind(x$times, x$nr.before)
+  colnames(m) <- c("time", my.model$state.names)
+  rownames(m) <- rep("",nrow(m))
+  print(m)
+  
   
 } ## end of function print.summary.trans

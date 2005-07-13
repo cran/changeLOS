@@ -202,4 +202,4 @@ sum((my.diffs * los$weights)[!(is.element(los$w.times, c(los$empty.0, los$empty.
 }
 
 \keyword{survival}
-\keyword{programming}
+\keyword{models}

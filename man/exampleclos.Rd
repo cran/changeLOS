@@ -46,4 +46,4 @@ exampleclos()
 \author{ Matthias Wangler \email{mw@imbi.uni-freiburg.de}}
 \seealso{ \code{\link{clos}} }
 
-\keyword{programming}
+\keyword{models}

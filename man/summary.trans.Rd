@@ -26,7 +26,8 @@ print.summary.trans(x, ...)
                }    
   }
   \item{state.names:}{ vector with the names of the states}
-  \item{nr.start}{numeric vector of the initial distribution in the states}
+  \item{times}{ the transition times}
+  \item{nr.before}{ matrix with the number in each state just before the transition times}
 }
 
 \author{Matthias Wangler \email{mw@imbi.uni-freiburg.de}}
