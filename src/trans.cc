@@ -45,23 +45,18 @@
 //-----------------------------------------------------------------------------
 // History: 30.08.2004, Matthias Wangler
 //                      the first version
-//          16.02.2004, Matthias Wangler
+//          16.02.2005, Matthias Wangler
 //                      replace long with int
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include <vector>
+#include "matrix.h"
+
 #include <map>
 #include <string>
 
 using namespace std;
 
-typedef vector<double> dVector;          // vector of doubles (double vector)
-typedef dVector::iterator itdVector;
-typedef vector<dVector> dMatrix;         // vector of double vectors (double matrix)
-typedef dMatrix::iterator itMatrix;
-typedef vector<dMatrix> dArray;          // vector of double matrices (Array of double matrices)
-typedef dArray::iterator itArray;
+
 
 typedef map<string,int> StringIntMap;  // map with string keys and int values 
 typedef StringIntMap::iterator itStringIntMap;
@@ -97,7 +92,7 @@ extern "C" {
 
     DoubleIntMap Times;       // for holding the timepoints at which the jumps occurs
 
-    dArray A;                  // for the transition matrices
+ 
 
     // storing the passed state names
     for( int i = 0; i < *nr_states; ++i ) {
@@ -125,34 +120,17 @@ extern "C" {
     }
 
     // initialize the array of the transition matrices
-    int i = 0;
-    for(int k = 0; k < *n; ++k ) {  // loop over the time points
+    Array A(a,*nrow,*ncol,*n);
 
-      dMatrix M;
-
-      for( int c = 0; c < *ncol; ++c ) { // loop over the columns
-	dVector V;
- 
-	for( int r = 0; r < *nrow; ++r ) { // loop over the rows
-
-	  V.push_back( a[i] );
-	  
-	  ++i;
-	} 
-   
-	M.push_back( V );
-      }
-
-      A.push_back( M );
-    }   
+    //cout << A << endl;
 
     // compute the number of jumps and store it in the array of the transition matrices
-    i=0;
-    for( ; i < *nr_observ; ++i) {      // loop over the observations (jumps)
+    for(int i=0 ; i < *nr_observ; ++i) {      // loop over the observations (jumps)
       string o_from(observ_from[i]);   // state name from where the observed jump occurs   
       string o_to(observ_to[i]);       // state name to which the observed jump occurs
 
-      for( int j = 0; j < *nr_from_to; ++j ) { // add the jump to the total number of jumps from state 'o_from' to state 'o_to'
+      // add the jump to the total number of jumps from state 'o_from' to state 'o_to'
+      for( int j = 0; j < *nr_from_to; ++j ) {
 	if( o_from == string(from[j]) && o_to == string(to[j]) ) {
 	  nr_jumps[j] += 1;
 	}
@@ -181,17 +159,19 @@ extern "C" {
 	      int c = posto->second;
               
               // add this jump in the k'th matrix at column c and row r
-	      A[k][c][r] += 1;
+	      A[k][r][c] += 1;
 	    }
 	  }	  
 	}	
       }
     }
 
+    //cout << A << endl;
+
     // compute the risk
-    dArray B(A);
-    i=0;    
-    for( ; i < *nr_times; ++i) {     
+    Array B(A);
+    
+    for(int i=0; i < *nr_times; ++i) {     
       for( itStringIntMap frompos = StatesFrom.begin(); frompos != StatesFrom.end(); ++frompos ) { 
         itStringIntMap pos =  StateNames.find(frompos->first);;
         int j = pos->second;        
@@ -202,11 +182,11 @@ extern "C" {
 
 	for( int k = 0; k < i; ++k ) {
 	   for( int r = 0; r < *nrow; ++r ) {
-	     jumps_to_j_before_i += B[k][j][r];
+	     jumps_to_j_before_i += B[k][r][j];
 	   }
 
 	   for( int c = 0; c < *ncol; ++c ) {
-	     jumps_from_j_before_i += B[k][c][j];
+	     jumps_from_j_before_i += B[k][j][c];
 	   }
         }
 
@@ -229,7 +209,7 @@ extern "C" {
     
 	if( risk > 0 ) {
 	   for( int c = 0; c < *ncol; ++c ) {             
-	     A[i][c][j] = A[i][c][j] / risk;
+	     A[i][j][c] = A[i][j][c] / risk;
 	   }
 	}  
       }
@@ -240,7 +220,7 @@ extern "C" {
 
         for( int c = 0; c < *ncol; ++c ) {
 	  if( c != r ) {
-	    sumrow += A[i][c][r];
+	    sumrow += A[i][r][c];
 	  }	 
         }
 
@@ -248,19 +228,9 @@ extern "C" {
       }               
     }
     
+    //cout << A << endl;
+
     // prepare the array of the transition matrices for returning (transform the array to an vector)
-    i = 0;
-    for( int k = 0; k < *n; ++k ) {  // loop over the timepoints
-
-      for( int c = 0;  c < *ncol; ++c ) {  // loop over the columns
-     
-        for( int r = 0; r < *nrow; ++r ) {   // loop over the rows
-
-	  a[i] = A[k][c][r];
-	  
-          ++i;
-        } 
-      }
-    }
+    A.as_double(a);
   }
 }

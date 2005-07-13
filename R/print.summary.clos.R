@@ -43,6 +43,11 @@ print.summary.clos <- function(x, ...) {
   cat("Change in LOS: ", x$cLOS, sep="")
   cat("\n\n")
   
+  cat("Change in LOS, patients discharged: ", x$phi2, sep="")
+  cat("\n\n")
+  
+  cat("Change in LOS, patients deceased: ", x$phi3, sep="")
+  cat("\n\n")
  
   a <- c("Number of observed patients", "Number of patients being discharged", "Number of patients who die",
          "Number of patients being censored", "Number of patients who experienced the intermediate event(IE)",
@@ -55,7 +60,8 @@ print.summary.clos <- function(x, ...) {
          x$cases.death, x$cases.cens)
   
   c <- c(round(100,2), round(x$patients.discharge/x$patients*100,2), round(x$patients.death/x$patients*100,2),
-         round(x$patients.cens/x$patients*100,2), round(x$cases/x$patients*100,2), round(x$cases.discharge/x$patients*100,2),
+         round(x$patients.cens/x$patients*100,2), round(x$cases/x$patients*100,2),
+         round(x$cases.discharge/x$patients*100,2),
          round(x$cases.death/x$patients*100,2), round(x$cases.cens/x$patients*100,2))
 
   colnames <- c("Total", "%")

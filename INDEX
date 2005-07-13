@@ -1,7 +1,7 @@
 aj                      Aalen-Johansen estimator
 clos                    Change in LOS
 exampleclos             example for clos
-los.data                data
+los.data                Length of hospital stay
 msmodel                 multi-state model
 plot.aj                 Plot function for objects of class 'aj'
 plot.clos               Plot function for objects of class 'clos'

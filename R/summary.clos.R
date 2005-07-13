@@ -48,7 +48,8 @@ summary.clos <- function(object, ...) {
     stop("Argument 'object' must be an object of class \"clos\".")
   }
 
-  summary <- list( cLOS=object$cLOS, patients=object$patients, patients.discharge=object$patients.discharge,
+  summary <- list( cLOS=object$cLOS, phi2=object$phi2, phi3=object$phi3,
+                   patients=object$patients, patients.discharge=object$patients.discharge,
                    patients.death=object$patients.death, patients.cens=object$patients.cens,
                    cases=object$cases, cases.discharge=object$cases.discharge, cases.death=object$cases.death,
                    cases.cens=object$cases.cens )

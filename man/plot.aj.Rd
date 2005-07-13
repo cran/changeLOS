@@ -21,7 +21,7 @@ plot.aj(x,
                  "(",italic(s), ",", italic(t), ")")),
                  list(a=from[1],b=to[1],s=x$start))),
         x.txt=(xlim[2]+xlim[1])/2,
-        y.txt=ylim[2]*0.95,
+        y.txt=ylim[2]*0.8,
         col=1, ...)   
 }
 \arguments{

@@ -5,7 +5,7 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
                     lab=c(10,10,7),
                     txt=eval(substitute(expression(paste(hat(P)[{a}][{b}], "(",italic( s), ",", italic(t), ")")),
                              list(a=from[1],b=to[1],s=x$start))),
-                    x.txt=(xlim[2]+xlim[1])/2,y.txt=ylim[2]*0.95,
+                    x.txt=(xlim[2]+xlim[1])/2,y.txt=ylim[2]*0.8,
                     col=1,...){
 ## ----------------------------------------------------------------------------
 ## Title: plot.aj
@@ -118,9 +118,10 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
                               list(a=from[i],b=to[i],s=x$start)))
       txt <- eval(substitute(expression(paste(hat(P)[{a}][{b}], "(",italic( s), ",", italic(t), ")")),
                              list(a=from[i],b=to[i],s=x$start)))
-
+      op <- par(mar=c(4, 5, 2, 1))
       plot(x=x$times,y=x$matrices[states[state.names==from[i]],states[state.names==to[i]],],
-           type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, col=col)
+           type ="s", lty=1, lwd=2, xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab, col=col, ...)
+      par(op)
     }
     else {      
       plot(x=x$times,y=x$matrices[states[state.names==from[i]],states[state.names==to[i]],],

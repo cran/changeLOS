@@ -38,14 +38,18 @@
 ## ---------------------------------------------------------------------------------
 ## Value: an object of class 'clos'. The object is a list of:
 ##
-## cLOS:      change in LOS
-## trans:     an object of class 'trans'
-## e.given.1  estimates E(T|Xti = 1), i = 1,..,n
-## e.given.0  estimates E(T|Xti = 0), i = 1,..,n
-## empty.1    event times: the group `intermediate, but no terminal event yet' was empty
-## empty.0    event times: the group `no intermediate or terminal event yet' was empty
-## weights    weights for the weighted average
-## called     how  the function clos() was called
+## cLOS:         change in LOS
+## trans:        an object of class 'trans'
+## e.given.1:    estimates E(T|X(ti) = 1), i = 1,..,n
+## e.given.0:    estimates E(T|X(ti) = 0), i = 1,..,n
+## phi2.case:    estimates E(T*1(X(T)=2|X(ti) = 1), i = 1,..,n
+## phi2.control: estimates P(X(T)=2|X(ti) = 1)*E(T|X(ti) = 0), i = 1,..,n
+## phi3.case:    estimates E(T*1(X(T)=3|X(ti) = 1), i = 1,..,n
+## phi3.control: estimates P(X(T)=3|X(ti) = 1)*E(T|X(ti) = 0), i = 1,..,n
+## empty.1:    event times: the group `intermediate, but no terminal event yet' was empty
+## empty.0:    event times: the group `no intermediate or terminal event yet' was empty
+## weights:    weights for the weighted average
+## called:     how  the function clos() was called
 ## patients: numeric, total number of observed patients (admissions)
 ## patients.discharge: numeric, number of patients being discharged
 ## patients.death: numeric, number of patients being death
@@ -76,6 +80,7 @@
 ##                        1. error handling: checking the passed arguments
 ##                        2. no fixed column names in the passed data frame
 ##                        3. function for computing transition matrices for any finite set of states
+##           09/05/2005   distinguishing between patients discharged and patients deceased
 ## ---------------------------------------------------------------------------------
   
     ## save the call of the function
@@ -165,52 +170,61 @@
     ## compute expected LOS given the state at every observed transition time _except for_
     ## the greatest observed time (which may be a censoring time)
 
+    my.times <- my.trans$times
+    
     ## is there a censoring time greater than the last observed transition time?
-    my.times <- sort(unique(c(my.trans$times, max(observ$time[observ$to==cens.state], my.trans$times))))
-    
-    ## find `transition matrices' that corresponds to my.times[i + 1]...
-    my.matrices <- array(0, c( nrow(model$tra), ncol(model$tra), length(my.times)))
-    
-    if( length(my.times) > 2 ) {     
-      for(i in (length(my.times)-2):1)
-        {
-          my.matrices[,,i] <- my.trans$matrices[,,length(my.trans$times[my.trans$times <= my.times[i + 1]])]
-        }    
-    }
-    
-    los <- matrix(data=rep(my.times,3), ncol=3, byrow=FALSE, dimnames=list(NULL, c("Time", "Given in state 1", "Given in state 0")))
-
-    dim <- dim(my.matrices)[1]
-  
-    ## will need to temporarily store Aalen-Johansen estimates
-    aj <- array(diag(1,dim,dim), c(dim, dim,1))    
-        
-    ## will need function that does matrix multiplication running
-    ## thru the `slices' of array aj
-    "my.function" <- function(x,y){ x%*%aj[,,y] }
-    
-    if( length(my.times) > 2 ) {
-      ## last two rows in los already correct. compute the rest, starting with the 
-      ## last but two row (which corresponds to the third greatest time in my.times)
-      los[length(my.times)-1,2:3] <- rep(max(my.times), 2)
+    tau <-  max(observ$time[observ$to==cens.state], my.trans$times)
       
-      for(i in (length(my.times)-2):1) {
-        ## compute time differences
-        diffs <- diff(my.times[(i+1):length(my.times)])
-        
-        ## multiply `transition matrix' with Aalen-Johansen estimates of the previous loop
-        aj <- array(apply(X=diag(1:dim(aj)[3]), 1, my.function, x=my.matrices[,,i]), c(dim ,dim, dim(aj)[3]))
-        
-        ## LOS given in state 1 at time my.times[i]
-        los[,2][i] <- my.times[i+1] + matrix(diffs, nrow=1) %*% matrix(aj[2,2,],ncol=1)
-        
-        ## LOS given in state 0 at time my.times[i]
-        los[,3][i] <- my.times[i+1] + matrix(diffs, nrow=1) %*% matrix((aj[1,1,] + aj[1,2,]),ncol=1)
-        
-        ## stack identity matrix on top for the next loop
-        aj <- array(c(diag(1, dim, dim), aj), c(dim, dim, (dim(aj)[3] + 1)))
-      }
+    my.matrices <- my.trans$matrices
+      
+    los <- matrix(data=rep(my.times,3), ncol=3, byrow=FALSE,
+                  dimnames=list(NULL, c("Time", "Given in state 1", "Given in state 0")))
+
+    ## distinguishing between patients discharged and patients deceased
+    phi2 <- matrix(data=c(my.times, rep(0,length(my.times)), rep(0,length(my.times))),
+                   ncol=3, byrow=FALSE,
+                   dimnames=list(NULL, c("Time", "Case term", "Control term")))
+
+    phi3 <- matrix(data=c(my.times, rep(0,length(my.times)), rep(0,length(my.times))),
+                   ncol=3, byrow=FALSE,
+                   dimnames=list(NULL, c("Time", "Case term", "Control term")))    
+
+
+    
+    if( length(my.times) > 1 ) {
+
+      out <- .C("los",as.double(my.times),
+                      as.double(my.matrices),
+                      as.integer(length(my.times)),
+                      as.integer(nrow(model$tra)),
+                      as.integer(ncol(model$tra)),
+                      los1        = as.double(los[,2]), ## LOS given state 1
+                      los0        = as.double(los[,3]), ## LOS given state 0
+                      ## phi:= los1 - los0
+	              ## phi2:= phi2case - phi2control
+	              ## phi3:= phi3case + phi3control
+	              ## es gilt:
+	              ## phi = phi2 + phi3
+                      phi2case    = as.double(phi2[,2]),
+                      phi2control = as.double(phi2[,3]),
+                      phi3case    = as.double(phi3[,2]),
+                      phi3control = as.double(phi3[,3]),
+                      as.double(tau),
+                PACKAGE="changeLOS")
+      
     }
+
+    los[,2]  <- out$los1
+
+    los[,3]  <- out$los0
+      
+    phi2[,2] <- out$phi2case
+ 
+    phi2[,3] <- out$phi2control
+
+    phi3[,2] <- out$phi3case
+
+    phi3[,3] <- out$phi3control   
     
     ## if one of the two groups of patients ('cases' and 'controls') is empty,
     ## the expected change in LOS at the questioned time must be set to 'NA'
@@ -226,13 +240,17 @@
 
       if( group.0 == 0 )
       {
-        los[,3][i] <- NA
+        los[,3][i]  <- NA
+        phi2[,3][i] <- NA
+        phi3[,3][i] <- NA
         times.empty.0 <- c( times.empty.0, my.times[i] )
       }
 
       if( group.1 == 0 )
       {
         los[,2][i] <- NA
+        phi2[,2][i] <- NA
+        phi3[,2][i] <- NA        
         times.empty.1 <- c( times.empty.1, my.times[i] )
       }
     }
@@ -240,7 +258,8 @@
     ## compute distribution to weight differences in LOS
     ## need waiting time distribution in initial state 0.
     ## create a survival object and fit it. event: left state 0.
-    T0 <- Surv(observ$time[observ$from== model$state.names[1]], 1 - (observ$to==cens.state)[observ$from== model$state.names[1]])
+    T0 <- Surv(observ$time[observ$from== model$state.names[1]],
+               1 - (observ$to==cens.state)[observ$from== model$state.names[1]])
     T0.fit <- survfit(T0)
     ## only need `time' and `surv' for non-censoring events
     T0.fit$time <- T0.fit$time[T0.fit$n.event!=0]
@@ -255,7 +274,14 @@
     los.diff <- los[,2]-los[,3]
     los.diff[is.na(los.diff)] <- 0    
     estimate <- matrix(los.diff[is.element(los[,1], T0.fit$time)], nrow=1)  %*% matrix(my.weights, ncol=1)    
-    
+
+    phi2.diff <- phi2[,2]-phi2[,3]
+    phi2.diff[is.na(phi2.diff)] <- 0    
+    estimate2 <- matrix(phi2.diff[is.element(phi2[,1], T0.fit$time)], nrow=1)  %*% matrix(my.weights, ncol=1)
+
+    phi3.diff <- phi3[,2]-phi3[,3]
+    phi3.diff[is.na(phi3.diff)] <- 0    
+    estimate3 <- matrix(phi3.diff[is.element(phi3[,1], T0.fit$time)], nrow=1)  %*% matrix(my.weights, ncol=1)
     ## some results for a summary:
     
     ## number of patients
@@ -277,7 +303,12 @@
     my.cases.cens <- sum(my.trans$nrtransitions[,3][my.trans$nrtransitions[,1]==2 & my.trans$nrtransitions[,2]==5])
         
     ## return results
-    res <- list(cLOS=estimate, trans=my.trans, e.given.1=c(los[,2]), e.given.0=c(los[,3]),
+    res <- list(cLOS=estimate, trans=my.trans,
+                e.given.1=c(los[,2]), e.given.0=c(los[,3]),
+                phi2=estimate2,
+                phi2.case=phi2[,2],  phi2.control=phi2[,3],
+                phi3=estimate3,
+                phi3.case=phi3[,2],  phi3.control=phi3[,3],
                 w.times=T0.fit$time,weights=my.weights,called=fcall,
                 patients=my.patients, patients.discharge=my.patients.discharge,
                 patients.death=my.patients.death, patients.cens=my.patients.cens,
@@ -311,8 +342,9 @@
       matrix((my.trans$matrices[1,3,] + my.trans$matrices[1,4,])[is.element(my.trans$times, T0.fit$time)], ncol=1)
 
     ## my.weights.23[i] corresponds to T0.fit$time[i]
-    my.weights.23 <- diag(diag(c(1, T0.fit$surv[1:length(T0.fit$surv)-1])) %*%
-                          diag((my.trans$matrices[1,3,] + my.trans$matrices[1,4,])[is.element(my.trans$times, T0.fit$time)])) / pr.cause23
+    my.weights.23 <-
+      diag(diag(c(1, T0.fit$surv[1:length(T0.fit$surv)-1])) %*%
+           diag((my.trans$matrices[1,3,] + my.trans$matrices[1,4,])[is.element(my.trans$times, T0.fit$time)])) / pr.cause23
 
     ##estimate.23 <- matrix((los[,2]-los[,3])[is.element(los[,1], T0.fit$time)], nrow=1)  %*% matrix(my.weights.23, ncol=1)
     estimate.23 <- matrix(los.diff[is.element(los[,1], T0.fit$time)], nrow=1)  %*% matrix(my.weights.23, ncol=1)

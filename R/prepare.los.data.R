@@ -14,7 +14,7 @@ prepare.los.data <- function(x) {
 ## ---------------------------------------------------------------------------------
 ## Usage: prepare.los.data( x )
 ##
-## x: data.frame of the form data.frame( j.01, j.02, j.03, j.12, j.13, cens.0, cens.1):
+## x: data.frame of the form data.frame( id, j.01, j.02, j.03, j.12, j.13, cens):
 ##
 ## id:      id (patient id, admision id, ...)
 ## j.01:    observed time for jump from 0 to 1
@@ -22,8 +22,7 @@ prepare.los.data <- function(x) {
 ## j.03:    observed time for jump from 0 to 3
 ## j.12:    observed time for jump from 1 to 2
 ## j.13:    observed time for jump from 1 to 3
-## cens.0:  observed time for censorde in 0
-## cens.1:  observed time for censorde in 1     
+## cens:    observed time for censoring
 ## ---------------------------------------------------------------------------------
 ## Value: data.frame of the form data.frame(id, from, to, time ):
 ##
@@ -57,11 +56,24 @@ prepare.los.data <- function(x) {
   }
 
   ## check the number of columns of the passed data.frame x
-  if( dim(x)[2] != 8 )
+  if( dim(x)[2] != 7 )
   {
-    stop("The passed data.frame 'x' doesn't include 8 columns.")      
+    stop("The passed data.frame 'x' doesn't include 7 columns.")      
   }
+
+  ## compute variables cens.0 for admissions censored in the initial state 0
+  ## and cens.1 for admissions censored in state 1
+
+  x$cens.0 <- x$cens
+  x$cens.0[is.finite(x[,2])] <- Inf
     
+  x$cens.1 <- x$cens
+  x$cens.1[is.infinite(x[,2])] <- Inf
+
+    
+  x <- x[,c(1,2,3,4,5,6,8,9)]
+
+  
   id   <- c(x[,1][x[,2] != Inf], x[,1][x[,3] != Inf],x[,1][x[,4] != Inf],
             x[,1][x[,5] != Inf], x[,1][x[,6] != Inf],x[,1][x[,7] != Inf],
             x[,1][x[,8] != Inf])

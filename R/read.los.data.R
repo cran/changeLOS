@@ -38,7 +38,7 @@ read.los.data <- function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1,
 ##             pos.columns[5]: jump form 1 to 3
 ##             pos.columns[6]: cens
 ## ---------------------------------------------------------------------------------
-## Value: data.frame of the form data.frame( j.01, j.02, j.03, j.12, j.13, cens.0, cens.1):
+## Value: data.frame of the form data.frame( id, j.01, j.02, j.03, j.12, j.13, cens):
 ##
 ## id.      id (patient id, admision id, ...)
 ## j.01:    observed time for jump from 0 to 1
@@ -46,8 +46,7 @@ read.los.data <- function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1,
 ## j.03:    observed time for jump from 0 to 3
 ## j.12:    observed time for jump from 1 to 2
 ## j.13:    observed time for jump from 1 to 3
-## cens.0:  observed time for censorde in 0
-## cens.1:  observed time for censorde in 1
+## cens:    observed time for censoring
 ## ---------------------------------------------------------------------------------
 ## Notes: -
 ## ---------------------------------------------------------------------------------
@@ -90,18 +89,6 @@ read.los.data <- function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1,
   ## set my own columnnames
   names(los.data) <- c("id", "j.01", "j.02", "j.03", "j.12", "j.13", "cens")
   
-  ## compute variables cens.0 for admissions censored in the initial state 0
-  ## and cens.1 for admissions censored in state 1
-
-  los.data$cens.0 <- los.data$cens
-  los.data$cens.0[is.finite(los.data[,2])] <- Inf
-    
-  los.data$cens.1 <- los.data$cens
-  los.data$cens.1[is.infinite(los.data[,2])] <- Inf
-
-    
-  los.data <- los.data[,c(1,2,3,4,5,6,8,9)]
-
   return(los.data)
 }
   

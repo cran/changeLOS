@@ -54,6 +54,23 @@ print.clos <- function(x, ...) {
   print(x$e.given.0)
   cat("\n")  
 
+  cat("Distinguishing  between patients discharged and patients deceased:\n")
+  cat("Discharged, case term:\n")
+  print(x$phi2.case)
+  cat("\n")
+  
+  cat("Discharged, control term:\n")
+  print(x$phi2.control)
+  cat("\n")  
+
+  cat("Deceased, case term:\n")
+  print(x$phi3.case)
+  cat("\n")
+  
+ cat("Deceased, control term:\n")
+  print(x$phi3.control)
+  cat("\n")   
+  
   cat("the group `intermediate, but no terminal event yet'\n")
   cat("was empty for the following event times: ")
   print(x$empty.1)

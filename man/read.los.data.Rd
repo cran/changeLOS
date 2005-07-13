@@ -50,7 +50,7 @@ pos.id=1, pos.columns) }
   transitions, this data structure will be less desirable.
 }
 \value{ 
-  a data frame of the form data.frame(id,j.01,j.02,j.03,j.12,j.13,cens.0,cens.1)
+  a data frame of the form data.frame(id,j.01,j.02,j.03,j.12,j.13,cens)
   \item{id}{ id (patient id, admision id)}
   \item{j.01}{ observed time for jump from 0 (initial state) to 1
     (intermediate state)}
@@ -58,15 +58,18 @@ pos.id=1, pos.columns) }
   \item{j.03}{ observed time for jump from 0 to 3 (death)}
   \item{j.12}{ observed time for jump from 1 to 2}
   \item{j.13}{ observed time for jump from 1 to 3}
-  \item{cens.0}{ observed time for censored in 0}
-  \item{cens.1}{ observed time for censoerd in 1}
+  \item{cens}{ censoring time (either in initial or intermediate state)}
 }
 \author{ Matthias Wangler \email{mw@imbi.uni-freiburg.de}}
 \seealso{ \code{\link{clos}},  \code{\link{prepare.los.data}} }
 \examples{
-## los.data <- read.los.data("los.data.txt",pos.id=1,pos.columns=c(2,3,4,5,6,7))
-## Results in the same data frame as:
-data(los.data)
+## Locate data file "los.data.csv" in sub-directory of package "changeLOS"
+filename <- paste(searchpaths()[seq(along=search())[search()==
+                  "package:changeLOS"]], "/data/los.data.csv", sep="")
+
+los.data <- read.los.data(filename,pos.id=1,pos.columns=c(2,3,4,5,6,7))
+
+## Results in the same data frame as: data(los.data)
 }
 
 \keyword{file}

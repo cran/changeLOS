@@ -56,8 +56,15 @@ clos(model, observ, aw=FALSE)
   Finally, \code{clos} treats the daywise
   comparison as being zero if there are not both patients with and
   without IE on that day.
-
-  See the examples for bootstrapping as well as use of the alternative weights.
+  See also Beyersmann et al. (2005) for a non-technical explanation of
+  these methods.
+  
+  See the examples for special features:
+  \itemize{
+    \item bootstrapping
+    \item use of the alternative weight
+    \item distinguishing between patients discharged and patients deceased    
+    }
 }
 \value{
   An object of class c('clos'). The object is a list of
@@ -69,9 +76,27 @@ clos(model, observ, aw=FALSE)
   \item{e.given.0 }{estimates E(LOS|\eqn{X_s = }initial state)  for
     all observed transition times \eqn{s}, where \eqn{X_s} denotes the
     state by time \eqn{s}}
+  \item{phi2}{weighted average of the difference between phi2.case and
+    phi2.control, this quantity can be interpreted as the contribution
+    to the expected change in LOS at time \eqn{s} by patients infected
+    at time \eqn{s} who eventually discharge
+  }  
+  \item{phi2.case}{estimates E(LOS \strong{1}(\eqn{X_LOS = }discharge)|\eqn{X_s = }intermediate event),
+    where \strong{1} denotes the indicator function}
+  \item{phi2.control}{P(\eqn{X_LOS = }discharge|\eqn{X_s = }intermediate
+    event) E(LOS|\eqn{X_s = }initial state)} 
+  \item{phi3}{weighted average of the difference between phi3.case and
+    phi3.control, this quantity can be interpreted as the contribution
+    to the expected change in LOS at time \eqn{s} by patients infected
+    at time \eqn{s} who eventually die
+  }
+  \item{phi3.case}{estimates E(LOS \strong{1}(\eqn{X_LOS = }death)|\eqn{X_s = }intermediate event),
+    where \strong{1} denotes the indicator function}
+  \item{phi3.control}{P(\eqn{X_LOS = }death|\eqn{X_s = }intermediate
+    event) E(LOS|\eqn{X_s = }initial state)}  
   \item{empty.1}{event times with the group `intermediate, but no terminal event yet' being empty}
-  \item{empty.0}{ event times with the group `no intermediate or terminal event yet' being empty}
-  \item{weights   }{weights for the weighted average }
+  \item{empty.0}{event times with the group `no intermediate or terminal event yet' being empty}
+  \item{weights}{weights for the weighted average }
   \item{w.times}{time points corresponding to the weights}
   \item{called }{how the function was called}
   \item{patients}{total number of observed patients}
@@ -100,15 +125,22 @@ clos(model, observ, aw=FALSE)
 \references{
   G Schulgen and M Schumacher (1996). Estimation of prolongation of
   hospital stay attributable to nosocomial infections.  \emph{Lifetime
-    Data Analysis} 2, 219-240.
+  Data Analysis} 2, 219-240.
 
+  J Beyersmann, P Gastmeier, H Grundmann, S B{\"a}rwolff, C Geffers,
+  M Behnke, H R{\"u}den, and M Schumacher (2005): Assessment of
+  prolongation of intensive care unit stay due to nosocomial infections,
+  using multistate models. \emph{Accepted for Infection Control and
+  Hospital Epidemiology}
+
+  
   A reference on multi-state models:
 
   P Andersen and N Keiding (2002). Multi-state models for event history
   analysis. \emph{Statistical Methods in Medical Research} 11, 91-115}
-\author{ Jan Beyersmann
-  \email{jan@fdm.uni-freiburg.de}
-         Matthias Wangler \email{mw@imbi.uni-freiburg.de}
+\author{
+  Jan Beyersmann \email{jan@fdm.uni-freiburg.de}
+  Matthias Wangler \email{mw@imbi.uni-freiburg.de}
 }
 \seealso{ \code{\link{survival}}, \link{exampleclos} }
 \examples{
@@ -125,6 +157,16 @@ los <- clos(model=my.model,observ=my.observ)
 summary(los)
 plot(los)
 
+## expected change in LOS due to an IE
+phi <- los$e.given.1 - los$e.given.0
+
+## distinguishing between patients discharged
+phi2 <- los$phi2.case - los$phi2.control
+## and patients deceased
+phi3 <- los$phi3.case - los$phi3.control 
+
+## we have phi = phi2 + phi3
+all(round(phi, digits=10) == round(phi2+phi3, digits=10),na.rm=TRUE)
 
 
 ## compute bootstrap SE with function boot() from library boot
