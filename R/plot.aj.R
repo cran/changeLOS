@@ -5,7 +5,7 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
                     lab=c(10,10,7),
                     txt=eval(substitute(expression(paste(hat(P)[{a}][{b}], "(",italic( s), ",", italic(t), ")")),
                              list(a=from[1],b=to[1],s=x$start))),
-                    x.txt=(xlim[2]+xlim[1])/2,y.txt=ylim[2]*0.8,
+                    x.txt=(xlim[2]+xlim[1])/2,y.txt=ylim[2]*0.9,
                     col=1,...){
 ## ----------------------------------------------------------------------------
 ## Title: plot.aj
@@ -132,7 +132,7 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
 
     clb <- c(clb,paste(from[i],to[i]))
            
-    text(x.txt, y.txt, txt,cex=2)
+    text(x.txt, y.txt, txt, ...)
   }
 
    m <- matrix( v, nrow=length(x$times), ncol=length(from)+1,byrow=FALSE)

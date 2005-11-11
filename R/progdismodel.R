@@ -1,7 +1,4 @@
-"progdismodel" <- function(data, plot=FALSE, file1, file2, file3, max.time, 
-                           lwd=2, cex=1.2,
-                           lty1=1, lty2=2, lty3=3,
-                           color1=4, color2=1, color3=2) {
+"progdismodel" <- function(model,observ, max.time) {
 ## --------------------------------------------------------------------------------
 ## Title: R-function progdismodel
 ## ---------------------------------------------------------------------------------
@@ -15,88 +12,127 @@
 ## ---------------------------------------------------------------------------------
 ## Required Packages: -
 ## ---------------------------------------------------------------------------------
-## Usage: progdismodel(data, file1, file2, file3, max.time,
-##                     lwd=2, cex=1.2, lty1=1, lty2=2, lty3=3,
-##                     color1=4, color2=1, color3=2)
+## Usage: progdismodel(model,observ)
 ##
-## data: data.frame of the form data.frame( id, j.01, j.02, j.03, j.12, j.13, cens):
+## model:    an object of the class 'msmodel' which describes the multi-state model
 ##
-## id:      id (patient id, admision id, ...)
-## j.01:    observed time for jump from "0" to "1"
-## j.02:    observed time for jump from "0" to "2"
-## j.03:    observed time for jump from "0" to "3"
-## j.12:    observed time for jump from "1" to "2"
-## j.13:    observed time for jump from "1" to "3"
-## cens:    observed time for censoring
+## observ:   data.frame with of the form data.frame( id, from, to, time ):
+##
+##           id:   id (patient id, admision id ...)
+##           from: the state from where a transition occurs
+##           to:   the state to which a transition occurs
+##           time: the time a transition occurs
+##           oid:  the observation id
+##
+## max.time:
 ## ---------------------------------------------------------------------------------
 ## Value: 
 ## ---------------------------------------------------------------------------------
 ## License: GPL 2
 ##----------------------------------------------------------------------------------
-## History:    19.09.2005, Matthias Wangler
+## History:    27.09.2005, Matthias Wangler
 ##                         first version
 ## ---------------------------------------------------------------------------------
+
+  ## argument 'model' must be passed
+  if( missing(model) ) {
+    stop("Argument 'model' is missing, with no defauls")
+  }
+  
+  ## argument 'observ' must be passed
+  if( missing(observ) ) {
+    stop("Argument 'observ' is missing, with no defauls")
+  }
+  
+  if( !inherits(model,"msmodel") ) {
+    stop("Arguemnt 'model' must be an object of class 'msmodel'.") 
+  }
+      
+  ## argument 'observ' must be data.frame
+  if( !is.data.frame( observ ) ) {
+    stop("Argument 'observ' is not data.frame")
+  }
+
+  ## check the model
+  if( nrow(model$tra) != 6 ){
+    stop("Argument 'model' must be a 'six-states model'.")
+  }
+
+  len <- length(model$state.names)    
+  from <-  model$state.names[][model$transitions[,1][model$transition[,2] != len]]
+  to <- model$state.names[][model$transitions[,2][model$transition[,2] != len]]
+  ufrom <- unique(from)
+  uto   <- unique(to)
+  absorb   <- setdiff(uto,ufrom)
+
+  if( length(ufrom) != 2 ) {
+    stop("Argument 'model' must be a 'six-states model' with 2 transient states.")  
+  }    
+  if( length(absorb) != 4 ) {
+    stop("Argument 'model' must be a 'six-states model' with 4 absorbing states.")  
+  }
+  
+  ## check the number of columns of the passed data.frame observ
+  if( dim(observ)[2] != 5 ){
+    stop("The passed data.frame 'observ' doesn't include 5 columns.")      
+  }
+
+  ## check the column names of the passed data.frame observ
+  if( names(observ)[1] != "id" || names(observ)[2] != "from" || names(observ)[3] != "to"
+     || names(observ)[4] != "time"|| names(observ)[5] != "oid") {
+    stop("The passed data.frame 'observ' must have the columns 'id', 'from', 'to', 'time' and 'oid'.")
+  }
     
-
-  ## prepare the data
-  ## --> one row for each transition
-  ob <- prepare.los.data(x = data)
-  
-  ## describe the model
-
-  ## 6x6 matrix to describe the possible transitions
-  tra <- rbind(c(TRUE,TRUE,TRUE,TRUE,FALSE,FALSE),
-               c(FALSE,TRUE,FALSE,FALSE,TRUE,TRUE),
-               c(FALSE,FALSE,TRUE,FALSE,FALSE,FALSE),
-               c(FALSE,FALSE,FALSE,TRUE,FALSE,FALSE),
-               c(FALSE,FALSE,FALSE,FALSE,TRUE,FALSE),
-               c(FALSE,FALSE,FALSE,FALSE,FALSE,TRUE))
-  
-  my.model <- msmodel(c("0", "1", "2", "3", "4", "5"), tra, cens.name = "cens")
-
-  
-  ## prepare the data for the 'progressive disability model':
-
-  ob$to <- factor(ob$to, levels=my.model$state.names)
-
-  ## set 'to' = 4 if 'from' = 1 and 'to' = 2
-  ob[,3][ob[,2]==1 & ob[,3]==2] <- 4
-
-  ## set 'to' = 5 if 'from' = 1 and 'to' = 3
-  ob[,3][ob[,2]==1 & ob[,3]==3] <- 5
+  ## check the number of rows of the passed data.frame observ
+  if( dim(observ)[1] == 0 ) {
+    stop("The passed data.frame 'observ' doesn't contain rows. There is nothing to do")
+  }
+     
 
   ## compute the Aalen-Johansen estimator for the matrices of transition posibilities
-  my.trans <- trans(my.model, ob)
+  my.trans <- trans(model, observ)
   my.aj <- aj(my.trans, s=0, t=max(my.trans$times))
 
+  ## P(X(0)=0)
+  PX0 <- my.trans$nr.before[1,1] / sum(my.trans$nr.before[1,])
+
+  ## P(X(0)=1)
+  PX1 <-  my.trans$nr.before[1,2] / sum(my.trans$nr.before[1,])
+
+    
   p00 <- my.aj$matrices[1,1,]
   p01 <- my.aj$matrices[1,2,]
   p02 <- my.aj$matrices[1,3,]
   p03 <- my.aj$matrices[1,4,]
   p04 <- my.aj$matrices[1,5,]
   p05 <- my.aj$matrices[1,6,]
+  p11 <- my.aj$matrices[2,2,]
+  p14 <- my.aj$matrices[2,5,]
+  p15 <- my.aj$matrices[2,6,]
   
-  my.times.par <- my.aj$times[ (p00+p02+p03) > 0 & (p01+p04+p05) > 0 & (p03+p05) > 0 ]
-
+  my.times.par <- my.aj$times
 
   if( !missing(max.time) ) {
     my.times.par <-  my.times.par[my.times.par <= max.time]
   }
   
-
   p00 <- p00[my.aj$times %in% my.times.par]
   p01 <- p01[my.aj$times %in% my.times.par]
   p02 <- p02[my.aj$times %in% my.times.par]
   p03 <- p03[my.aj$times %in% my.times.par]
   p04 <- p04[my.aj$times %in% my.times.par]
   p05 <- p05[my.aj$times %in% my.times.par]
-
-  prob.death <- (p03 + p05)   ## death
-
+  p11 <- p11[my.aj$times %in% my.times.par]
+  p14 <- p14[my.aj$times %in% my.times.par]
+  p15 <- p15[my.aj$times %in% my.times.par]
+  
+  prob.death <- PX0*(p03 + p05) + PX1*p15   ## death
+  
   prob.death.rfa <- p03 / (p00+p02+p03) ## death, given risk factor absent
-
-  prob.death.rfp <- p05 / (p01+p04+p05) ## death, given risk factor present
-
+  prob.death.rfa[is.na(prob.death.rfa)] <- 0
+  
+  prob.death.rfp <- (PX0*p05 + PX1*p15) / (PX0*(p01+p04+p05) + PX1*(p11+p14+p15)) ## death, given risk factor present
+  prob.death.rfp[is.na(prob.death.rfp)] <- 0
 
   my.ar <- prob.death.rfp - prob.death.rfa ## attributable risk
   
@@ -108,91 +144,6 @@
   names( prob.death.rfa) <- NULL
   names( prob.death.rfp) <- NULL
 
-  if( plot == TRUE ) {
-    if( missing(file1) ) {
-      x11()
-    }
-    else {
-      postscript(file=file1)
-    }          
-    
-    plot(y=prob.death, x=my.times.par, type="l",
-         xlab="Time t", ylab="mortality",
-         main="Mortality",
-         lwd=lwd,
-         lty=lty1,
-         col=color1,
-         ylim=c(min(prob.death, prob.death.rfa, prob.death.rfp), max(prob.death, prob.death.rfa, prob.death.rfp) ) )
-    
-    lines(y=prob.death.rfa, x=my.times.par, type="l", lwd=lwd, lty=lty2, col=color2)
-    lines(y=prob.death.rfp, x=my.times.par, type="l", lwd=lwd, lty=lty3, col=color3)
-    
-    legend(x=max(my.times.par)/2,
-           y=max(prob.death, prob.death.rfa, prob.death.rfp)/4,
-           legend=c("P( death )","P( death | risk factor absent)","P( death | risk factor present)") ,
-           bty="o", pch=c(15,15,15), cex=cex,
-           lty=c(lty1,lty2,lty3), col=c(color1,color2,color3))
-    
-    
-    if( !missing(file1) ) {
-      dev.off()
-    }
-    
-    
-    if( missing(file2) ) {
-      x11()
-    }
-    else {
-      postscript(file=file2)
-    }
-    
-    plot(y=my.ar, x=my.times.par, type="l",
-         xlab="Time t", ylab="AR",
-         main="Attributable Mortality",
-         lwd=lwd,
-         col=color1)
-    
-    lines(y=rep(0,length(my.times.par)), x=my.times.par, type="l",lty=2)
-    
-    if( !missing(file2) ) {
-      dev.off()
-    }
-
-    if( missing(file3) ) {
-      x11()
-    }
-    else {
-      postscript(file=file3)
-    }
-    
-    plot(y=my.par, x=my.times.par, type="l",
-         xlab="Time t", ylab="PAR",
-         main="Population Attributable Mortality",
-         lwd=lwd,
-         col=color1)
-    
-    lines(y=rep(0,length(my.times.par)), x=my.times.par, type="l",lty=2)
-    
-    if( !missing(file3) ) {
-      dev.off()
-    }
-  }
-
-  nt <- length(my.times.par)
-
-  a <- prob.death[nt]
-  b <- prob.death.rfa[nt]
-  c <- prob.death.rfp[nt]
-  d <- my.ar[nt]
-  e <- my.par[nt]
-
-  s <- matrix( c(a,b,c,d,e), ncol=1)
-
-  rownames(s) <- c("P(death)", "P(death | risk factor absent)",
-                   "P(death | risk factor present)", "Attriburable Mortality",
-                   "Population Attrributable Mortality")
-    
-  colnames(s) <- ""
     
   ## return the result
   res <- list(trans=my.trans,
@@ -202,9 +153,9 @@
               AR=my.ar,
               death=prob.death,
               death.given.rfa=prob.death.rfa,
-              death.given.rfp=prob.death.rfp,
-              tab=s)
+              death.given.rfp=prob.death.rfp)
 
+  class(res) <- "progdismodel"
 
   return(res)
 }

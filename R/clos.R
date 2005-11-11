@@ -120,7 +120,7 @@
     ## check the model
     if( nrow(model$tra) != 4 )
     {
-      stop("Argument 'model' must be a 'four-sate model'.")
+      stop("Argument 'model' must be a 'four-states model'.")
     }
     len <- length(model$state.names)    
     from <-  model$state.names[][model$transitions[,1][model$transition[,2] != len]]
@@ -129,10 +129,10 @@
     uto   <- unique(to)
     absorb   <- setdiff(uto,ufrom)
     if( length(ufrom) != 2 ) {
-       stop("Argument 'model' must be a 'four-sate model' with 2 transient states.")  
+       stop("Argument 'model' must be a 'four-states model' with 2 transient states.")  
     }    
     if( length(absorb) != 2 ) {
-      stop("Argument 'model' must be a 'four-sate model' with 2 absorbing states.")  
+      stop("Argument 'model' must be a 'four-states model' with 2 absorbing states.")  
     }
     
     ## check the number of columns of the passed data.frame observ
