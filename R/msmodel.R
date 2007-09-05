@@ -1,4 +1,5 @@
-msmodel <- function(state.names,tra=matrix(TRUE,length(state.names),length(state.names)),cens.name="cens") {
+"msmodel" <-
+function(state.names,tra=matrix(TRUE,length(state.names),length(state.names)),cens.name="cens") {
 ## ----------------------------------------------------------------------------
 ## Title: multi-state model
 ## ----------------------------------------------------------------------------
@@ -112,3 +113,4 @@ msmodel <- function(state.names,tra=matrix(TRUE,length(state.names),length(state
   return(msm)
   
 } ## end of function msmodel
+

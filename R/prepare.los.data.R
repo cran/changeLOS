@@ -1,4 +1,5 @@
-prepare.los.data <- function(x) {
+"prepare.los.data" <-
+function(x) {
 ## --------------------------------------------------------------------------------
 ## Title: R-function prepare.los.data()
 ## ---------------------------------------------------------------------------------
@@ -103,3 +104,4 @@ prepare.los.data <- function(x) {
   
   return(observ)
 }
+

@@ -1,4 +1,5 @@
-"prepare.progdismodel" <- function(data) {
+"prepare.progdismodel" <-
+function(data) {
 ## ----------------------------------------------------------------------------
 ## Title: prepare.progdismodel
 ## ----------------------------------------------------------------------------
@@ -67,3 +68,4 @@
   return(res)
   
 } ## end of function prepare.progdismodel
+

@@ -1,18 +1,14 @@
 \name{summary.trans}
 \alias{summary.trans}
-\alias{print.summary.trans}
 \title{Summary method for objects of class 'trans'}
 \description{
   Summary method for objects of class \code{\link{trans}}.
 }
 \usage{
 summary.trans(object, ...)
-
-print.summary.trans(x, ...)
 }
 \arguments{
   \item{object}{An object of class \code{trans}.}
-  \item{x}{An object of class \code{summary.trans}.}
   \item{...}{other arguments}
 }
 \value{

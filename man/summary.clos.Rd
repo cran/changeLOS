@@ -1,18 +1,14 @@
 \name{summary.clos}
 \alias{summary.clos}
-\alias{print.summary.clos}
 \title{Summary method for objects of class 'clos'}
 \description{
   Summary method for objects of class \code{clos}.
 }
 \usage{
 summary.clos(object, ...)
-
-print.summary.clos(x, ...)
 }
 \arguments{
   \item{object}{An object of class \code{clos}.}
-  \item{x}{An object of class \code{summary.clos}.}
   \item{...}{other arguments}
 }
 \value{

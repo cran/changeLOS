@@ -1,4 +1,5 @@
-print.msmodel <- function(x, ...) {
+"print.msmodel" <-
+function(x, ...) {
 ## ----------------------------------------------------------------------------
 ## Title: print.msmodel
 ## ----------------------------------------------------------------------------
@@ -74,3 +75,4 @@ print.msmodel <- function(x, ...) {
   cat("\n")  
   
 } ## end of function print.msmodel
+

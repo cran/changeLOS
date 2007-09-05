@@ -1,4 +1,5 @@
-"progdismodel" <- function(model,observ, max.time) {
+"progdismodel" <-
+function(model,observ, max.time) {
 ## --------------------------------------------------------------------------------
 ## Title: R-function progdismodel
 ## ---------------------------------------------------------------------------------
@@ -159,3 +160,4 @@
 
   return(res)
 }
+

@@ -1,4 +1,5 @@
-plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
+"plot.aj" <-
+function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
                     ylab= eval(substitute(expression(paste("Estimate of ", P[{a}][{b}], "(", italic(s), ",", italic(t), ")")),
                                list(a=from[1],b=to[1],s=x$start))),
                     xlim = c(x$start,max(x$times)), ylim=c(0,1),
@@ -140,5 +141,5 @@ plot.aj <- function(x,from,to,xlab=expression(paste(Time, " ", italic(t))),
    dimnames(m) <- list(NULL,clb)
 
   return(m)
-} 
+}
 

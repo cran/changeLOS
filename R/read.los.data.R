@@ -1,4 +1,5 @@
-read.los.data <- function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1, pos.columns) {
+"read.los.data" <-
+function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1, pos.columns) {
 ## --------------------------------------------------------------------------------
 ## Title: R-function read.los.data()
 ## ---------------------------------------------------------------------------------
@@ -91,4 +92,4 @@ read.los.data <- function( file, sep=";", header=TRUE, row.names=NULL, pos.id=1,
   
   return(los.data)
 }
-  
+

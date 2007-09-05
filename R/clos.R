@@ -1,4 +1,5 @@
-"clos" <- function(model,observ,aw=FALSE) {
+"clos" <-
+function(model,observ,aw=FALSE) {
 ## ---------------------------------------------------------------------------------
 ## Title: R-function clos()
 ## ---------------------------------------------------------------------------------
@@ -360,3 +361,4 @@
     return(res)      
     
   }## end of function
+

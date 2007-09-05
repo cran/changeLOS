@@ -1,4 +1,5 @@
-trans <- function(model, observ) {
+"trans" <-
+function(model, observ) {
 ## ----------------------------------------------------------------------------
 ## Title: trans
 ## ----------------------------------------------------------------------------
@@ -134,25 +135,26 @@ trans <- function(model, observ) {
 
   ## array for the transition matrices
   matrices <- array(0, c( nrow(model$tra), ncol(model$tra),length(times)))
-  
-  ## compute the initial distribution (number in each state at the begin)
+
   nr.start <- rep(0, ifelse(censoring==TRUE,len,len-1))
-  for( i in 1:(len-1) ) {
-    nf <- sum(observ.from==states[i]) - sum(observ.to==states[i])
-
-    if( nf > 0 ) {
-      nr.start[i] <- nf
+  dd <- split(observ,observ$oid)
+  count <- NULL
+  for( i in 1:length(unique(observ$oid)) )
+    {
+      dd[[i]]$from <- as.factor(dd[[i]]$from)
+      dd[[i]]$from2 <- as.numeric(levels(dd[[i]]$from)[dd[[i]]$from])
+      count[i] <- dd[[i]][order(dd[[i]][,"time"])[1],"from2"]
+      nr.start[count[i]+1] <- nr.start[count[i]+1]+1
     }
-  }
-
+  
   ## matrix to store the number in each state just before the transition times (risk)
   nr.before <- matrix(0, nrow=length(times), ncol=ifelse(censoring==TRUE,len,len-1))
   nr.before[1,] <- nr.start
 
   ## matrix for storing the total number of transitions for all possible transitions
   nrtransitions <-  matrix(c(model$transitions[,1]-1, model$transitions[,2]-1, rep(0,length(model$transitions[,1]))),
-                     nrow = length(model$transitions[,1]), ncol = 3, byrow = FALSE)             
-  
+                     nrow = length(model$transitions[,1]), ncol = 3, byrow = FALSE)       
+	
   out <- .C("trans",
              as.integer(length(states)-1),
              as.integer(length(times)),
@@ -189,3 +191,4 @@ trans <- function(model, observ) {
   
   return(res)
 }
+

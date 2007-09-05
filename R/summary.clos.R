@@ -1,4 +1,5 @@
-summary.clos <- function(object, ...) {
+"summary.clos" <-
+function(object, ...) {
 ## ----------------------------------------------------------------------------
 ## Title: summary.clos
 ## ----------------------------------------------------------------------------
@@ -59,3 +60,4 @@ summary.clos <- function(object, ...) {
   summary
   
 } ## end of function summary.clos
+

@@ -1,4 +1,5 @@
-"print.progdismodel" <- function(x, ...) {
+"print.progdismodel" <-
+function(x, ...) {
 ## ----------------------------------------------------------------------------
 ## Title: print.progdismodel
 ## ----------------------------------------------------------------------------
@@ -52,3 +53,4 @@
   cat("\n")
   
 } ## end of function print.progdismodel
+

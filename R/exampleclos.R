@@ -1,4 +1,5 @@
-exampleclos <- function() {
+"exampleclos" <-
+function() {
 ## ----------------------------------------------------------------------------
 ## Title: exampleclos
 ## ----------------------------------------------------------------------------
@@ -51,3 +52,4 @@ exampleclos <- function() {
   los <- clos(model=my.model,observ=my.observ)
   return(los)
 } ## end of function exampleclos
+

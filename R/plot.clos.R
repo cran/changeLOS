@@ -1,4 +1,5 @@
-plot.clos <- function(x,opt=0,
+"plot.clos" <-
+function(x,opt=0,
                       xlab=expression(paste(Time, " ", italic(t))),
                       ylab.1="Expected LOS",ylab.2="Weights",
                       xlim = c(0,max(x$trans$times[!is.na(x$e.given.1) | !is.na(x$e.given.0)])),
@@ -193,4 +194,5 @@ plot.clos <- function(x,opt=0,
     par(op)
     close.screen(all = TRUE)
   } 
-} 
+}
+

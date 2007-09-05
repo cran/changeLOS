@@ -1,4 +1,5 @@
-aj <- function(tr,s=0,t=tr$times[length(tr$times)]) {
+"aj" <-
+function(tr,s=0,t=tr$times[length(tr$times)]) {
 ## ----------------------------------------------------------------------------
 ## Title:  Aalen-Johansen estimator
 ## ----------------------------------------------------------------------------
@@ -114,3 +115,4 @@ aj <- function(tr,s=0,t=tr$times[length(tr$times)]) {
     return(res)
 
 } ## end of function aj
+

@@ -1,4 +1,5 @@
-summary.trans <- function(object, ...) {
+"summary.trans" <-
+function(object, ...) {
 ## ----------------------------------------------------------------------------
 ## Title: summary.trans
 ## ----------------------------------------------------------------------------
@@ -56,3 +57,4 @@ summary.trans <- function(object, ...) {
   summary
     
 } ## end of function summary.trans
+
