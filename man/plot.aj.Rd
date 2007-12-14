@@ -7,7 +7,7 @@
   time. The time origin is determined by the object of the class \code{\link{aj}}. 
 }
 \usage{
-plot.aj(x,
+\method{plot}{aj}(x,
         from,
         to,
         xlab=expression(paste(Time, " ", italic(t))),

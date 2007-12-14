@@ -5,7 +5,7 @@
   Print method for objects of class \code{msmodel}.
 }
 \usage{
-print.msmodel(x, ...)
+\method{print}{msmodel}(x, ...)
 }
 \arguments{
   \item{x}{An object of class \code{msmodel}.}

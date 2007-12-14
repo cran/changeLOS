@@ -66,6 +66,7 @@ trans(model, observ)
   Andersen and Keiding (2002). Multi-state models for event history
   analysis. \emph{Statistical Methods in Medical Research} 11 (2),
   91--115.
+
 }
 \author{ Matthias Wangler \email{mw@imbi.uni-freiburg.de}}
 

@@ -5,7 +5,7 @@
   Print method for objects of class \code{progdismodel}.
 }
 \usage{
-print.progdismodel(x, ...)
+\method{print}{progdismodel}(x, ...)
 }
 \arguments{
   \item{x}{An object of class \code{progdismodel}.}

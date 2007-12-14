@@ -71,7 +71,7 @@ function(model, observ) {
   ## check the number of columns of the passed data.frame observ
   if( dim(observ)[2] != 5 )
   {
-    stop("The passed data.frame 'observ' doesn't include 4 columns.")      
+    stop("The passed data.frame 'observ' doesn't include 5 columns.")      
   }
 
   ## check the column names of the passed data.frame observ
@@ -107,8 +107,8 @@ function(model, observ) {
   
   ## check the obsrvation data for undefined transitions
   observ.transitions <- unique(observ[,2:3])    
-  a <- paste(observ.transitions[,1],observ.transitions[,2],sep="") 
-  b <- paste( state.names[model$transitions[,1]], state.names[model$transitions[,2]],sep="") 
+  a <- paste(observ.transitions[,1],observ.transitions[,2],sep="")
+  b <- paste( state.names[model$transitions[,1]], state.names[model$transitions[,2]],sep="")
   if( length(a[!(a %in% b)]) > 0 )
   {
     stop("Undefined transitions 'from'-'to' in the observation.")

@@ -6,7 +6,7 @@
    Print method for objects of class \code{aj}.
 }
 \usage{
-print.aj(x, ...)
+\method{print}{aj}(x, ...)
 }
 
 \arguments{

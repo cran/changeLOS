@@ -5,7 +5,7 @@
   Print method for objects of class \code{\link{trans}}.
 }
 \usage{
-print.trans(x, ...)
+\method{print}{trans}(x, ...)
 }
 \arguments{
   \item{x}{An object of class \code{trans}.}

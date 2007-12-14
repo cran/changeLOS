@@ -42,14 +42,19 @@ function(x, ...) {
   cat("\n")
   print(x$times)
   cat("\n")
-  
-  for(i in 1:length(x$times)) {
-    cat(paste("Estimate of P(", x$start, ",", x$times[i], ")", sep=""))
-    cat("\n")
-    print(x$matrices[,,i])
-    cat("\n")
+  if (!is.null(x$times)) {
+    for(i in 1:length(x$times)) {
+      cat(paste("Estimate of P(", x$start, ",", x$times[i], ")", sep=""))
+      cat("\n")
+      print(x$matrices[,,i])
+      cat("\n")
+    }
   }
-  
+  else {
+    cat(paste("Estimate of P(", x$start, ",", x$end, ")", sep=""))
+    cat("\n")
+    print(x$matrices[,,1])
+  }
   cat("\n")
   
   

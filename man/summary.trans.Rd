@@ -5,7 +5,7 @@
   Summary method for objects of class \code{\link{trans}}.
 }
 \usage{
-summary.trans(object, ...)
+\method{summary}{trans}(object, ...)
 }
 \arguments{
   \item{object}{An object of class \code{trans}.}

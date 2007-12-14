@@ -77,16 +77,14 @@ function(tr,s=0,t=tr$times[length(tr$times)]) {
 
     first <- length(tr$times[tr$times <= s]) + 1
     last <- length(tr$times[tr$times <= t])
-
     if(!all((first:last) %in% (1:dim(tr$matrices)[3])))
     {
       stop("Not for all time points exists a transition matrix.")
     }
-    
+     
     ajm <- diag(1,dim,dim)
-
+    
     ajt <- array(diag(1,dim,dim), c(dim, dim,1))  
-
     if( first <= last )
     {
       j <- 1
@@ -101,18 +99,24 @@ function(tr,s=0,t=tr$times[length(tr$times)]) {
        if( i < last ) {
          ajt <- array(c(ajt,diag(1, dim, dim)), c(dim, dim, (dim(ajt)[3] + 1)))
        }
-      }
-    }
-
+      }   
+    #id <- array(diag(1,dim,dim), c(dim, dim))
     dimnames(ajm) <- rep(dimnames(tr$matrices)[1],2)
-    
-    dimnames(ajt) <- list(dimnames(tr$matrices)[[1]], dimnames(tr$matrices)[[1]], paste("Estimate of P(", s, ",", tr$times[first:last], ")", sep=""))
-
-    res <- list(matrix=ajm,start=s,end=t,times=tr$times[first:last],matrices=ajt)
+    dimnames(ajt) <- list(dimnames(tr$matrices)[[1]], dimnames(tr$matrices)[[1]],
+                          paste("Estimate of P(", s, ",", tr$times[first:last], ")", sep=""))
+    times=tr$times[first:last]
+    }
+    else {
+      dimnames(ajm) <- rep(dimnames(tr$matrices)[1],2)
+      dimnames(ajt) <- list(dimnames(tr$matrices)[[1]], dimnames(tr$matrices)[[1]],
+                          paste("No transition observed in (",s,",",t,"]",sep=""))
+      times <- NULL
+    }
+    res <- list(matrix=ajm,start=s,end=t,times=times,matrices=ajt)
     
     class(res) <- "aj"
       
     return(res)
 
-} ## end of function aj
+}## end of function aj
 

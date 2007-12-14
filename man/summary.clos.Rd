@@ -5,7 +5,7 @@
   Summary method for objects of class \code{clos}.
 }
 \usage{
-summary.clos(object, ...)
+\method{summary}{clos}(object, ...)
 }
 \arguments{
   \item{object}{An object of class \code{clos}.}

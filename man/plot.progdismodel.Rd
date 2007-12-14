@@ -9,7 +9,7 @@
 }
 
 \usage{
-plot.progdismodel(x,
+\method{plot}{progdismodel}(x,
                   file1, file2, file3, 
                   lwd=2, cex=1.2,
                   lty1=1, lty2=1, lty3=1,

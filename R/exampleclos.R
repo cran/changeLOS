@@ -42,12 +42,13 @@ function() {
 ##-----------------------------------------------------------------------------
 ## History: 28.07.2004, Matthias Wangler
 ## ----------------------------------------------------------------------------
-  data(los.data)
+  data(list="los.data")
+  los.data <- los.data
   my.observ <- prepare.los.data(x=los.data)
-  tra <- matrix(F,4,4)
-  diag(tra) <- T
-  tra[1,] <- T
-  tra[2,3:4] <- T  
+  tra <- matrix(FALSE,4,4)
+  diag(tra) <- TRUE
+  tra[1,] <- TRUE
+  tra[2,3:4] <- TRUE  
   my.model <- msmodel(c("0","1","2","3"),tra,cens.name="cens")
   los <- clos(model=my.model,observ=my.observ)
   return(los)
