@@ -1,7 +1,7 @@
 \name{clos}
 \alias{clos}
 \title{ Change in LOS }
-\encoding{latin1}
+%\encoding{latin1}
 \description{
   estimates the expected change in length of stay (LOS) associated with
   an intermediate event (IE). In order to account for the timing of events (an
@@ -128,8 +128,8 @@ clos(model, observ, aw=FALSE)
   hospital stay attributable to nosocomial infections.  \emph{Lifetime
   Data Analysis} 2, 219-240.
 
-  J Beyersmann, P Gastmeier, H Grundmann, S \enc{Bärwolff}{Baerwolf}, C Geffers,
-  M Behnke, H \enc{Rüden}{Rueden}, and M Schumacher (2006). Use of Multistate
+  J Beyersmann, P Gastmeier, H Grundmann, S Baerwolf, C Geffers,
+  M Behnke, H Rueden, and M Schumacher (2006). Use of Multistate
   Models to Assess Prolongation of Intensive Care Unit Stay Due to
   Nosocomial Infection. \emph{Infection Control and Hospital
     Epidemiology} 27, 493-499.

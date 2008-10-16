@@ -10,23 +10,32 @@
 \method{plot}{clos}(x, opt=0,
           xlab=expression(paste(Time, " ", italic(t))),
           ylab.1="Expected LOS",ylab.2="Weights",
-          xlim = c(0,max(x$trans$times[!is.na(x$e.given.1) | !is.na(x$e.given.0)])),
-          xlim.2 = c(0,max(x$trans$times[!is.na(x$phi2.case) | !is.na(x$phi2.control) |
-                                         !is.na(x$phi3.case) | !is.na(x$phi3.control) ])),                     
+          xlim = c(0,max(x$trans$times[!is.na(x$e.given.1) |
+                                       !is.na(x$e.given.0)])),
+          xlim.2 = c(0,max(x$trans$times[!is.na(x$phi2.case) |
+                                         !is.na(x$phi2.control) |
+                                         !is.na(x$phi3.case) |
+                                         !is.na(x$phi3.control)])),
           ylim.0=c(0,max(x$weights,na.rm=TRUE)),
           ylim.1=c(0,max(x$e.given.1,x$e.given.0,na.rm=TRUE)),
-          ylim.2=c(0,max(x$x$phi2.case,x$phi2.control,x$phi3.case,x$phi3.control, na.rm=TRUE)),                
+          ylim.2=c(0,max(x$x$phi2.case,x$phi2.control,
+                         x$phi3.case,x$phi3.control, na.rm=TRUE)),
           col1=c(1,2),col2=c(1), lty1=c(1,1), lty2=c(1), lwd1=c(2,2), lwd2=c(2),
           lab.1=c(10,10,7), lab.2=c(10,3,7),
           lgd.1=expression(
               paste(Intermediate, " ", event, " ", by, " ", time, " ",italic(t)),
-              paste(No, " ", intermediate, " ", event, " ", by, " ", time, " ",italic(t))),
+              paste(No, " ", intermediate, " ", event, " ", by, " ",
+                    time, " ",italic(t))),
           lgd.2=expression(
-              paste(Case, " ", term, " ", by, " ",  time, " ",italic(t),", ",  patients, " ", discharged),
-              paste(Control, " ", term, " ", by, " ", time, " ",italic(t),", ",  patients, " ", discharged)),
+              paste(Case, " ", term, " ", by, " ",  time, " ",
+                    italic(t),", ",  patients, " ", discharged),
+              paste(Control, " ", term, " ", by, " ", time, " ",
+                    italic(t),", ",  patients, " ", discharged)),
           lgd.3=expression(
-              paste(Case, " ", term, " ", by, " ", time, " ",italic(t),", ",  patients, " ", deceased),
-              paste(Control, " ", term, " ", by, " ", time, " ",italic(t),", ",  patients, " ", deceased)),             
+              paste(Case, " ", term, " ", by, " ", time, " "
+                    ,italic(t),", ",  patients, " ", deceased),
+              paste(Control, " ", term, " ", by, " ", time, " ",
+                    italic(t),", ",  patients, " ", deceased)),             
           x.lgd=0,
           y.lgd.1=ylim.1[2]*0.9,
           y.lgd.2=ylim.2[2]*0.9,

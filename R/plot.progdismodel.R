@@ -38,7 +38,7 @@ function(x,
 
   if( missing(file1) ) {
     ##x11()
-    get(getOption("device"))()
+    dev.new()
   }
   else {
     postscript(file=file1)
@@ -70,7 +70,7 @@ function(x,
   
   if( missing(file2) ) {    
     ##x11()
-    get(getOption("device"))()
+    dev.new()
   }
   else {
     postscript(file=file2)
@@ -90,7 +90,7 @@ function(x,
   
   if( missing(file3) ) {
     ##x11()
-    get(getOption("device"))()
+    dev.new()
   }
   else {
     postscript(file=file3)
