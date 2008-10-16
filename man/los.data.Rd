@@ -22,12 +22,6 @@
   }
 }
 
-\source{ }
-
-\references{
-
-}
-
 \examples{
 data(los.data)
 }

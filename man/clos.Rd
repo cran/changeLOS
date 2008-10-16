@@ -28,7 +28,7 @@ clos(model, observ, aw=FALSE)
 		\item{oid}{the observation id}		
             }    
   }
-  \item{aw}{ locical, with (TRUE) or without(FALSE) alternative weighting}	  
+  \item{aw}{locical, with (TRUE) or without(FALSE) alternative weighting}	  
 	 
 }
 \details{
@@ -114,13 +114,16 @@ clos(model, observ, aw=FALSE)
 \section{Value 'alternative weighting'}{
   When aw=TRUE an object of class c('clos','closa'). The object is a
   list like above with the following extra items:
-  
+
+  \describe{
   \item{weights.1}{weights corresponding to the conditional weighting
     time in the intial state given one reaches the IE.}
   \item{weights.23}{weights corresponding to the conditional weighting
     time in the intial state given one \emph{does not} reach the IE.}
   \item{given.1}{change in LOS corresponding to the alternative weights 'weights.1'}
-  \item{given.23}{change in LOS corresponding to the alternative weights 'weights.2'}
+  \item{given.23}{change in LOS corresponding to the alternative weights
+    'weights.2'}
+  }
 }
 \note{required packages: survival }
 \references{
