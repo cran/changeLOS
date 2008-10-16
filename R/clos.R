@@ -261,7 +261,7 @@ function(model,observ,aw=FALSE) {
     ## create a survival object and fit it. event: left state 0.
     T0 <- Surv(observ$time[observ$from== model$state.names[1]],
                1 - (observ$to==cens.state)[observ$from== model$state.names[1]])
-    T0.fit <- survfit(T0)
+    T0.fit <- survfit(T0 ~ 1)
     ## only need `time' and `surv' for non-censoring events
     T0.fit$time <- T0.fit$time[T0.fit$n.event!=0]
     T0.fit$surv <- T0.fit$surv[T0.fit$n.event!=0]
